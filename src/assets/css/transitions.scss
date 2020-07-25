@@ -1,0 +1,51 @@
+// Page transition
+.page-enter-active {
+  transition: all 0.4s ease-out;
+}
+.page-leave-active {
+  transition: all 0.4s ease-in;
+}
+.page-enter {
+  opacity: 0;
+  //   transform: translateX(-30%);
+}
+.page-leave-to {
+  opacity: 0;
+  //   transform: translateX(30%);
+}
+
+.move-x-enter-active, .move-x-reverse-enter-active {
+  transition: all 0.3s ease-out;
+}
+.move-x-leave-active, move-x-reverse-leave-active {
+  transition: all 0.3s ease-in;
+}
+.move-x-enter {
+  opacity: 0;
+  transform: translateX(-30px);
+}
+.move-x-leave-to {
+  opacity: 0;
+  transform: translateX(30px);
+}
+.move-x-reverse-enter {
+  opacity: 0;
+  transform: translateX(30px);
+}
+.move-x-reverse-leave-to {
+  opacity: 0;
+  transform: translateX(-30px);
+}
+
+// Flip X
+.flip-x-enter {
+  transform: rotateY(90deg);
+}
+.flip-x-enter-active,
+.flip-x-leave-active {
+  transition: all 0.15s;
+  transform-style: preserve-3d;
+}
+.flip-x-leave-to {
+  transform: rotateY(90deg);
+}
