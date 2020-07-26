@@ -1,6 +1,7 @@
 import Vue from "vue";
 import Vuex from "vuex";
 import LayoutStoreModule from "@/store/layout";
+import FolderStoreModule from "@/store/folder";
 
 Vue.use(Vuex);
 
@@ -9,6 +10,7 @@ export default new Vuex.Store({
   mutations: {},
   actions: {},
   modules: {
-    layout: LayoutStoreModule
+    layout: LayoutStoreModule,
+    folder: FolderStoreModule
   }
 });

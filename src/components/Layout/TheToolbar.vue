@@ -32,6 +32,22 @@
       </router-link>
     </v-toolbar-title>
     <v-spacer />
+    <v-btn depressed class="mr-4" @click="openFolder">
+      <v-icon class="mr-2" size="18">
+        fas fa-folder
+      </v-icon>
+      <span style="padding-top: 1px">
+        Open folder
+      </span>
+    </v-btn>
+    <v-btn depressed>
+      <v-icon class="mr-2" size="20">
+        fab fa-youtube
+      </v-icon>
+      <span style="padding-top: 1px">
+        Download
+      </span>
+    </v-btn>
   </v-app-bar>
 </template>
 <script lang="ts">
@@ -41,7 +57,12 @@ import Component from "vue-class-component";
 @Component({
   components: {}
 })
-export default class extends Vue {}
+export default class extends Vue {
+  openFolder() {
+    // this.$store.commit("folder/setFolderName", new Date().toDateString());
+    // this.$store.dispatch("folder/fetchSongFiles");
+  }
+}
 </script>
 <style lang="scss">
 .logo-link {
