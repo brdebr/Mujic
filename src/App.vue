@@ -3,11 +3,12 @@
     <TheDrawer />
     <TheToolbar />
     <v-main>
-      <v-container class="align-start bg-gradient" fill-height fluid>
+      <v-container class="align-start bg-gradient px-4" fill-height fluid>
         <transition name="page" mode="out-in">
           <router-view :key="$route.fullPath" />
         </transition>
       </v-container>
+      <AudioControls />
     </v-main>
   </v-app>
 </template>
@@ -15,6 +16,7 @@
 <script>
 import TheDrawer from "@/components/Layout/TheDrawer.vue";
 import TheToolbar from "@/components/Layout/TheToolbar.vue";
+import AudioControls from "@/components/App/AudioControls.vue";
 
 export default {
   name: "App",
@@ -23,7 +25,8 @@ export default {
   }),
   components: {
     TheToolbar,
-    TheDrawer
+    TheDrawer,
+    AudioControls
   },
   mounted() {
     // this.$store.commit('app/fetchInstances');

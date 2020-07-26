@@ -1,10 +1,16 @@
 <template>
-  <v-app-bar clipped-left app dark flat color="blue darken-4">
+  <v-app-bar
+    clipped-left
+    app
+    dark
+    flat
+    color="orange accent-4"
+    class="the-toolbar"
+  >
     <v-btn
       outlined
       fab
-      small
-      class="white--text ml-3 mr-4"
+      class="white--text ml-3 mr-4 custom-side-button"
       @click="$store.commit('layout/toggleDrawer')"
     >
       <v-icon small>
@@ -47,5 +53,16 @@ export default class extends Vue {}
   .logo-img {
     max-height: 36px;
   }
+}
+.the-toolbar {
+  .v-toolbar__content {
+    border-bottom: 3px solid #bf360c;
+  }
+}
+.custom-side-button {
+  border-width: 3px;
+  $button-size: 48px;
+  height: $button-size !important;
+  width: $button-size !important;
 }
 </style>

@@ -13,7 +13,7 @@
     <v-layout column justify-space-between fill-height>
       <v-list :shaped="!$store.state.layout.drawerMini">
         <v-list-item
-          class="blue drawer-header"
+          class="amber darken-2 drawer-header"
           :style="{
             transition: 'margin .18s linear',
             marginRight: $store.state.layout.drawerMini ? null : '8px'
@@ -87,6 +87,6 @@ div.v-list-item.drawer-header {
   margin-bottom: 8px;
 }
 .drawer-border {
-  border-right: 2px solid #2979ff;
+  border-right: 3px solid #e65100;
 }
 </style>
