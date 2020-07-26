@@ -53,14 +53,15 @@
 <script lang="ts">
 import Vue from "vue";
 import Component from "vue-class-component";
+import { ipcRenderer } from "electron";
 
 @Component({
   components: {}
 })
 export default class extends Vue {
-  openFolder() {
-    // this.$store.commit("folder/setFolderName", new Date().toDateString());
-    // this.$store.dispatch("folder/fetchSongFiles");
+  async openFolder() {
+    const folderPath = await ipcRenderer.invoke("dialogGetFolder");
+    this.$store.dispatch("folder/fetchSongFiles", folderPath);
   }
 }
 </script>

@@ -1,5 +1,5 @@
 <template>
-  <v-card tile style="position: absolute; bottom: 0; width: 100%;">
+  <v-card tile style="position: fixed; bottom: 0; width: calc(100% - 80px);">
     <v-progress-linear
       color="indigo darken-4"
       :value="50"

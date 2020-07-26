@@ -3,6 +3,7 @@
 import { app, protocol, BrowserWindow } from "electron";
 import installExtension, { VUEJS_DEVTOOLS } from 'electron-devtools-installer';
 import { createProtocol } from "vue-cli-plugin-electron-builder/lib";
+import IpcManager from './IpcManager';
 const isDevelopment = process.env.NODE_ENV !== "production";
 
 // Keep a global reference of the window object, if you don't, the window will
@@ -47,6 +48,9 @@ async function createWindow() {
   win.on("closed", () => {
     win = null;
   });
+
+  IpcManager.initListeners();
+
 }
 
 // Quit when all windows are closed.

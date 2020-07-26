@@ -66,18 +66,18 @@ html {
 
 ::-webkit-scrollbar-thumb {
   border-radius: 8px;
-  background: rgb(34, 89, 172);
+  background: #FF9100 ;
   &:hover {
-    background: rgb(18, 91, 201);
+    background: #BF360C;
   }
 }
 
 ::-webkit-scrollbar-track {
   // margin-top: 2px;
   // margin-bottom: 0px;
-  background: #cccccc5b;
+  background: #fff1745b;
   &:hover {
-    background: #bcbdff67;
+    background: #fddb455b;
   }
 }
 

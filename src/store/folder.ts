@@ -1,4 +1,5 @@
 import { Module } from "vuex";
+import { ipcRenderer } from "electron";
 
 interface FolderStateI {
   folderName: string;
@@ -14,12 +15,16 @@ const FolderStoreModule: Module<FolderStateI, any> = {
   mutations: {
     setFolderName: (state, payload) => {
       state.folderName = payload;
+    },
+    setSongFiles: (state, payload) => {
+      state.songFiles = payload;
     }
   },
   actions: {
-    fetchSongFiles(context) {
-      context.commit("setFolderName", "aa");
-      context.commit("layout/toggleDrawer", null, { root: true });
+    async fetchSongFiles(context, folderPath) {
+      context.commit("setFolderName", folderPath);
+      const songFiles = await ipcRenderer.invoke("getSongFiles", folderPath);
+      context.commit("setSongFiles", songFiles);
     }
   }
 };
