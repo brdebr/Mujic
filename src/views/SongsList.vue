@@ -31,7 +31,7 @@
                   {{ song.name }}
                 </v-list-item-title>
                 <v-list-item-subtitle>
-                  <!-- {{ song.tags.join(" -- ") }} -->
+                  Lorem ipsum
                 </v-list-item-subtitle>
               </v-list-item-content>
               <!-- <v-list-item-action>
@@ -67,26 +67,10 @@ import Component from "vue-class-component";
 @Component({
   components: {}
 })
-export default class extends Vue {
-  selectSong(song: Record<string, any>, i: number) {
+export default class SongsList extends Vue {
+  async selectSong(song: Record<string, any>, i: number) {
     this.$store.commit("folder/selectSong", i);
+    await this.$store.dispatch("audio/fetchAudio64");
   }
-
-  // items: Array<AudioItem> = [
-  //   {
-  //     name: "It's My life - Bon Jovi",
-  //     subtitle: "10/11/1990"
-  //   },
-  //   {
-  //     name: "The Walker - Fitz & The Trantrums",
-  //     subtitle: "10/11/1990",
-  //     active: true
-  //   },
-  //   {
-  //     name: "Felling Still - Portugal The Man",
-  //     subtitle: "10/11/1990"
-  //   }
-  // ];
-  // songsPath = "D:\\Downloads";
 }
 </script>

@@ -8,7 +8,7 @@
           <router-view :key="$route.fullPath" />
         </transition>
       </v-container>
-      <AudioControls />
+      <AudioControls :audio="$store.state.audio.audio || {}" />
     </v-main>
   </v-app>
 </template>

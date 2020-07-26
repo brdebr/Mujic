@@ -1,6 +1,7 @@
 import { ipcMain, dialog } from "electron";
 import fs from "fs";
 import path from "path";
+import { SongFileI } from '@/store/folder';
 
 export default class IpcManager {
   static initListeners() {
@@ -27,7 +28,7 @@ export default class IpcManager {
             path: fullPath,
             extension,
             name: path.basename(el.name, extension)
-          };
+          } as SongFileI;
         })
     });
 

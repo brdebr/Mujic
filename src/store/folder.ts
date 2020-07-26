@@ -1,10 +1,16 @@
 import { Module } from "vuex";
 import { ipcRenderer } from "electron";
 
-interface FolderStateI {
+export interface FolderStateI {
   folderName: string;
   selected: number;
-  songFiles: [];
+  songFiles: Array<SongFileI>;
+}
+
+export interface SongFileI {
+  path: string;
+  extension?: string;
+  name: string;
 }
 
 const FolderStoreModule: Module<FolderStateI, any> = {
@@ -35,10 +41,10 @@ const FolderStoreModule: Module<FolderStateI, any> = {
       context.commit("setFolderName", folderPath);
       const songFiles = await ipcRenderer.invoke("getSongFiles", folderPath);
       context.commit("setSongFiles", songFiles);
-    },
-    async fetchAudio64(context, songPath) {
-      return await ipcRenderer.invoke("getSongBase64", songPath);
     }
+    // async fetchAudio64(context, songPath) {
+    //   return await ipcRenderer.invoke("getSongBase64", songPath);
+    // }
   }
 };
 export default FolderStoreModule;
