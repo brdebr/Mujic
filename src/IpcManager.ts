@@ -21,11 +21,18 @@ export default class IpcManager {
         .readdirSync(folderPath, { withFileTypes: true })
         .filter(el => el.isFile())
         .map(el => {
+          let fullPath = path.join(folderPath, el.name);
+          let extension = path.extname(el.name);
           return {
-            path: path.join(folderPath, el.name),
-            name: path.basename(el.name, path.extname(el.name))
+            path: fullPath,
+            extension,
+            name: path.basename(el.name, extension)
           };
         })
-      });
+    });
+
+    ipcMain.handle("getSongBase64", (event, songPath: string) => {
+      return fs.readFileSync(songPath, {encoding: 'base64'});
+    });
   }
 }

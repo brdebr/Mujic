@@ -13,35 +13,42 @@
           </span>
         </v-card-title>
         <v-divider />
-        <template v-for="item in $store.state.folder.songFiles">
-          <v-list-item :key="item.name">
-            <v-list-item-avatar>
-              <v-icon large>
-                fas fa-compact-disc {{ item.active ? "fa-spin" : null }}
-              </v-icon>
-            </v-list-item-avatar>
-            <v-list-item-content>
-              <v-list-item-title>
-                {{ item.name }}
-              </v-list-item-title>
-              <v-list-item-subtitle>
-                {{ item.subtitle }}
-              </v-list-item-subtitle>
-            </v-list-item-content>
-            <v-list-item-action>
-              <v-btn icon outlined>
-                <v-icon
-                  color="grey lighten-1"
-                  size="14"
-                  style="padding-left: 2px;"
-                >
-                  fas fa-play
+        <v-list-item-group :value="$store.state.folder.selected" color="amber">
+          <template v-for="(song, i) in $store.state.folder.songFiles">
+            <v-list-item
+              :key="song.name"
+              @click="selectSong(song, i)"
+              :ripple="{ center: true }"
+            >
+              <v-list-item-avatar>
+                <v-icon large>
+                  fas fa-compact-disc
+                  {{ i === $store.state.folder.selected ? "fa-spin" : null }}
                 </v-icon>
-              </v-btn>
-            </v-list-item-action>
-          </v-list-item>
-          <v-divider inset :key="`${item.name}-div`" />
-        </template>
+              </v-list-item-avatar>
+              <v-list-item-content>
+                <v-list-item-title class="black--text">
+                  {{ song.name }}
+                </v-list-item-title>
+                <v-list-item-subtitle>
+                  <!-- {{ song.tags.join(" -- ") }} -->
+                </v-list-item-subtitle>
+              </v-list-item-content>
+              <!-- <v-list-item-action>
+                <v-btn icon outlined>
+                  <v-icon
+                    color="grey lighten-1"
+                    size="14"
+                    style="padding-left: 2px;"
+                  >
+                    fas fa-play
+                  </v-icon>
+                </v-btn>
+              </v-list-item-action> -->
+            </v-list-item>
+            <v-divider inset :key="`${song.name}-divid`" />
+          </template>
+        </v-list-item-group>
       </v-card>
     </v-col>
   </v-row>
@@ -61,6 +68,10 @@ import Component from "vue-class-component";
   components: {}
 })
 export default class extends Vue {
+  selectSong(song: Record<string, any>, i: number) {
+    this.$store.commit("folder/selectSong", i);
+  }
+
   // items: Array<AudioItem> = [
   //   {
   //     name: "It's My life - Bon Jovi",
