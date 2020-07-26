@@ -13,22 +13,29 @@
           </span>
         </v-card-title>
         <v-divider />
-        <v-list-item-group
-          :value="$store.state.folder.selected"
-          color="amber"
+        <v-virtual-scroll
+          :items="$store.state.folder.songFiles"
+          bench="1"
+          :item-height="61"
+          height="510"
           v-if="$store.state.folder.folderName && !$store.state.folder.loading"
         >
-          <template v-for="(song, i) in $store.state.folder.songFiles">
+          <template #default="{ item, index }">
             <v-list-item
-              :key="song.name"
-              @click="selectSong(song, i)"
+              :key="item.name"
+              @click="selectSong(item, index)"
               :ripple="{ center: true }"
+              :class="
+                index === $store.state.folder.selected
+                  ? 'v-item--active v-list-item--active amber--text'
+                  : null
+              "
             >
               <v-list-item-avatar>
                 <v-icon large>
                   fas fa-compact-disc
                   {{
-                    i === $store.state.folder.selected &&
+                    index === $store.state.folder.selected &&
                     $store.state.audio.state === "playing"
                       ? "fa-spin"
                       : null
@@ -37,16 +44,31 @@
               </v-list-item-avatar>
               <v-list-item-content>
                 <v-list-item-title class="black--text">
-                  {{ song.name }}
+                  {{ item.name }}
                 </v-list-item-title>
                 <v-list-item-subtitle>
-                  Lorem ipsum
+                  <div class="d-flex align-center">
+                    <div>
+                      Lorem ipsum
+                    </div>
+                    <div class="ml-auto">
+                      <span class="mr-10">
+                        {{ formatBytes(item.meta.size) }}
+                      </span>
+                      <span class="mr-4">
+                        {{ formatDate(item.meta.atimeMs) }}
+                      </span>
+                      <span>
+                        {{ formatDate(item.meta.mtimeMs) }}
+                      </span>
+                    </div>
+                  </div>
                 </v-list-item-subtitle>
               </v-list-item-content>
             </v-list-item>
-            <v-divider inset :key="`${song.name}-divid`" />
+            <v-divider inset :key="`${item.name}-divid`" />
           </template>
-        </v-list-item-group>
+        </v-virtual-scroll>
         <v-card-text
           v-if="!$store.state.folder.folderName && !$store.state.folder.loading"
         >
@@ -75,6 +97,8 @@ import Vue from "vue";
 import Component from "vue-class-component";
 import OpenFolder from "../components/Actions/OpenFolder.vue";
 
+import moment from "moment";
+
 @Component({
   components: {
     OpenFolder
@@ -83,6 +107,22 @@ import OpenFolder from "../components/Actions/OpenFolder.vue";
 export default class SongsList extends Vue {
   async selectSong(song: Record<string, any>, i: number) {
     await this.$store.dispatch("folder/selectSongByIndex", i);
+    this.$store.state.audio.audio.play();
+  }
+
+  formatDate(ms: number) {
+    return moment(ms).format("HH:mm DD/MM/yyyy");
+  }
+  formatBytes(bytes: number) {
+    if (bytes === 0) return "0 Bytes";
+
+    const k = 1024;
+    const dm = 2;
+    const sizes = ["Bytes", "KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB"];
+
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+
+    return `${parseFloat((bytes / Math.pow(k, i)).toFixed(dm))} ${sizes[i]}`;
   }
 }
 </script>

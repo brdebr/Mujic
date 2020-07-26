@@ -13,7 +13,7 @@ export default class IpcManager {
       if (selection.canceled) {
         return "";
       }
-      return selection.filePaths[0] || "";
+      return path.normalize(selection.filePaths[0]) || "";
     });
 
     ipcMain.handle("getSongFiles", async (event, folderPath: string) => {
@@ -25,10 +25,25 @@ export default class IpcManager {
         .map(el => {
           let fullPath = path.join(folderPath, el.name);
           let extension = path.extname(el.name);
+          let {
+            size,
+            atimeMs,
+            mtimeMs,
+            ctimeMs,
+            birthtimeMs,
+            ...waste
+          } = fs.statSync(fullPath);
           return {
             path: fullPath,
             extension,
-            name: path.basename(el.name, extension)
+            meta: {
+              size,
+              atimeMs,
+              mtimeMs,
+              ctimeMs,
+              birthtimeMs
+            },
+            name: path.basename(el.name, extension),
           } as SongFileI;
         })
     });

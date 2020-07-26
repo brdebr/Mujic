@@ -66,8 +66,9 @@ html {
 
 ::-webkit-scrollbar-thumb {
   border-radius: 8px;
-  background: #FF9100 ;
+  background: #FF9100;
   &:hover {
+    border-radius: 3px;
     background: #BF360C;
   }
 }

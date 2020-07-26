@@ -32,8 +32,14 @@ const FolderStoreModule: Module<FolderStateI, any> = {
     setSongFiles: (state, payload) => {
       state.songFiles = payload;
     },
-    selectSong: (state, payload) => {
-      state.selected = payload;
+    selectSong: (state, index) => {
+      if (index >= 0 && index < state.songFiles.length) {
+        state.selected = index;
+      } else if (index < 0 && state.songFiles.length) {
+        state.selected = state.songFiles.length - 1;
+      } else if (index >= state.songFiles.length) {
+        state.selected = 0;
+      }
     }
   },
   getters: {
@@ -44,6 +50,10 @@ const FolderStoreModule: Module<FolderStateI, any> = {
   actions: {
     async selectSongByIndex(ctx, index) {
       ctx.commit("selectSong", index);
+      await ctx.dispatch("audio/fetchAudio64", null, { root: true });
+    },
+    async selectSongByDiff(ctx, diff) {
+      ctx.commit("selectSong", ctx.state.selected - diff);
       await ctx.dispatch("audio/fetchAudio64", null, { root: true });
     },
     async fetchSongFiles(ctx, folderPath) {

@@ -44,7 +44,7 @@
         </v-list-item-icon>
         <!-- <<  |>  >> -->
         <v-list-item-icon>
-          <v-btn outlined icon>
+          <v-btn outlined icon @click="playNext">
             <v-icon small>fas fa-fast-backward</v-icon>
           </v-btn>
         </v-list-item-icon>
@@ -56,7 +56,7 @@
           </v-btn>
         </v-list-item-icon>
         <v-list-item-icon class="ml-0">
-          <v-btn outlined icon>
+          <v-btn outlined icon @click="playBefore">
             <v-icon small>fas fa-fast-forward</v-icon>
           </v-btn>
         </v-list-item-icon>
@@ -92,11 +92,15 @@ export default class AudioControls extends Vue {
 
   playingNext = true;
 
+  async playBefore() {
+    await this.$store.dispatch("folder/selectSongByDiff", -1);
+    this.$nextTick(() => {
+      this.audio.play();
+    });
+  }
+
   async playNext() {
-    await this.$store.dispatch(
-      "folder/selectSongByIndex",
-      this.$store.state.folder.selected + 1
-    );
+    await this.$store.dispatch("folder/selectSongByDiff", 1);
     this.$nextTick(() => {
       this.audio.play();
     });
