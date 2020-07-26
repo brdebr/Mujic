@@ -1,12 +1,5 @@
 <template>
-  <v-app-bar
-    clipped-left
-    app
-    dark
-    flat
-    color="orange accent-4"
-    class="the-toolbar"
-  >
+  <v-app-bar clipped-left app flat color="orange accent-4" class="the-toolbar">
     <v-btn
       outlined
       fab
@@ -22,6 +15,7 @@
         <v-btn
           depressed
           class="px-6"
+          color="blue-grey darken-4"
           :ripple="{ center: true, class: 'lime--text text--lighten-3' }"
         >
           <!-- <v-icon color="white" class="mr-4 ml-n1">
@@ -32,14 +26,7 @@
       </router-link>
     </v-toolbar-title>
     <v-spacer />
-    <v-btn depressed class="mr-4" @click="openFolder">
-      <v-icon class="mr-2" size="18">
-        fas fa-folder
-      </v-icon>
-      <span style="padding-top: 1px">
-        Open folder
-      </span>
-    </v-btn>
+    <OpenFolder />
     <v-btn depressed>
       <v-icon class="mr-2" size="20">
         fab fa-youtube
@@ -54,16 +41,14 @@
 import Vue from "vue";
 import Component from "vue-class-component";
 import { ipcRenderer } from "electron";
+import OpenFolder from "@/components/Actions/OpenFolder.vue";
 
 @Component({
-  components: {}
-})
-export default class extends Vue {
-  async openFolder() {
-    const folderPath = await ipcRenderer.invoke("dialogGetFolder");
-    this.$store.dispatch("folder/fetchSongFiles", folderPath);
+  components: {
+    OpenFolder
   }
-}
+})
+export default class extends Vue {}
 </script>
 <style lang="scss">
 .logo-link {

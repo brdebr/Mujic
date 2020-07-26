@@ -24,13 +24,16 @@ const AudioStoreModule: Module<AudioStateI, any> = {
     },
     initAudio(state) {
       state.audio = new Audio(`data:audio/x-wav;base64, ${state.base64}`);
+    },
+    setAudioState(state, payload) {
+      state.state = payload;
     }
   },
   getters: {},
   actions: {
     async fetchAudio64(ctx) {
       const song: SongFileI = ctx.rootGetters["folder/selectedSong"];
-      console.log({ song });
+      // console.log({ song });
       ctx.commit(
         "setBase64",
         await ipcRenderer.invoke("getSongBase64", song.path)

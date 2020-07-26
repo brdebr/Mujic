@@ -5,6 +5,7 @@ export interface FolderStateI {
   folderName: string;
   selected: number;
   songFiles: Array<SongFileI>;
+  loading: boolean;
 }
 
 export interface SongFileI {
@@ -18,11 +19,15 @@ const FolderStoreModule: Module<FolderStateI, any> = {
   state: {
     folderName: "",
     selected: 0,
-    songFiles: []
+    songFiles: [],
+    loading: false
   },
   mutations: {
     setFolderName: (state, payload) => {
       state.folderName = payload;
+    },
+    setLoading: (state, payload) => {
+      state.loading = payload;
     },
     setSongFiles: (state, payload) => {
       state.songFiles = payload;
@@ -37,14 +42,18 @@ const FolderStoreModule: Module<FolderStateI, any> = {
     }
   },
   actions: {
-    async fetchSongFiles(context, folderPath) {
-      context.commit("setFolderName", folderPath);
+    async selectSongByIndex(ctx, index) {
+      ctx.commit("selectSong", index);
+      await ctx.dispatch("audio/fetchAudio64", null, { root: true });
+    },
+    async fetchSongFiles(ctx, folderPath) {
+      ctx.commit("setFolderName", folderPath);
+      ctx.commit("setLoading", true);
       const songFiles = await ipcRenderer.invoke("getSongFiles", folderPath);
-      context.commit("setSongFiles", songFiles);
+      ctx.commit("setSongFiles", songFiles);
+      await ctx.dispatch("selectSongByIndex", 0);
+      ctx.commit("setLoading", false);
     }
-    // async fetchAudio64(context, songPath) {
-    //   return await ipcRenderer.invoke("getSongBase64", songPath);
-    // }
   }
 };
 export default FolderStoreModule;

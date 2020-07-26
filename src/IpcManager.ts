@@ -18,9 +18,10 @@ export default class IpcManager {
 
     ipcMain.handle("getSongFiles", async (event, folderPath: string) => {
         // console.log(`getSongFiles(${folderPath})`);
+        let extensions = ['.mp3', '.ogg', '.wav']
         return fs
         .readdirSync(folderPath, { withFileTypes: true })
-        .filter(el => el.isFile())
+        .filter(el => el.isFile() && extensions.includes(path.extname(el.name)))
         .map(el => {
           let fullPath = path.join(folderPath, el.name);
           let extension = path.extname(el.name);
@@ -32,8 +33,8 @@ export default class IpcManager {
         })
     });
 
-    ipcMain.handle("getSongBase64", (event, songPath: string) => {
-      return fs.readFileSync(songPath, {encoding: 'base64'});
+    ipcMain.handle("getSongBase64", async (event, songPath: string) => {
+      return await fs.promises.readFile(songPath, {encoding: 'base64'})
     });
   }
 }

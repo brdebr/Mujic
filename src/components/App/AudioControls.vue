@@ -13,6 +13,14 @@
     />
     <v-list>
       <v-list-item>
+        <div class="px-3 mr-3">
+          <div>
+            {{ currentTimeVal }}
+          </div>
+          <div>
+            {{ totalTimeVal }}
+          </div>
+        </div>
         <v-list-item-content>
           <v-list-item-title>
             {{ selectedSong.name }}
@@ -22,19 +30,28 @@
           </v-list-item-subtitle>
         </v-list-item-content>
         <v-spacer />
+        <v-list-item-icon class="mr-10">
+          <v-btn
+            outlined
+            icon
+            :class="{ 'amber lighten-3': playingNext }"
+            title="Play next song after"
+            @click="playingNext = !playingNext"
+            :style="playingNext ? 'border: 2px solid !important;' : null"
+          >
+            <v-icon small>far fa-list-alt</v-icon>
+          </v-btn>
+        </v-list-item-icon>
+        <!-- <<  |>  >> -->
         <v-list-item-icon>
           <v-btn outlined icon>
             <v-icon small>fas fa-fast-backward</v-icon>
           </v-btn>
         </v-list-item-icon>
         <v-list-item-icon :class="{ 'mx-5': $vuetify.breakpoint.mdAndUp }">
-          <v-btn
-            outlined
-            icon
-            @click="v => (audio.paused ? audio.play() : audio.pause())"
-          >
+          <v-btn outlined icon @click="handlePlay">
             <v-icon small>
-              {{ audio && audio.paused ? "fas fa-play" : "fas fa-pause" }}
+              {{ audioState === "playing" ? "fas fa-pause" : "fas fa-play" }}
             </v-icon>
           </v-btn>
         </v-list-item-icon>
@@ -54,6 +71,15 @@ import Component from "vue-class-component";
 import { mapGetters } from "vuex";
 import { Prop, Watch } from "vue-property-decorator";
 
+import moment from "moment";
+function parseSecondsToHuman(seconds: number) {
+  return moment
+    .utc()
+    .startOf("day")
+    .add({ seconds: seconds })
+    .format("mm:ss");
+}
+
 @Component({
   computed: {
     ...mapGetters("folder", {
@@ -64,41 +90,97 @@ import { Prop, Watch } from "vue-property-decorator";
 export default class AudioControls extends Vue {
   selectedSong: any;
 
+  playingNext = true;
+
+  async playNext() {
+    await this.$store.dispatch(
+      "folder/selectSongByIndex",
+      this.$store.state.folder.selected + 1
+    );
+    this.$nextTick(() => {
+      this.audio.play();
+    });
+  }
+
+  audioState: "playing" | "paused" | "stoped" = "stoped";
   progress = 0;
+  duration = 0;
+  currentTimeVal = "00:00";
+  totalTimeVal = "00:00";
 
   @Prop()
   audio: any;
 
-  @Watch("audio")
-  audioListeners(newVal: HTMLAudioElement, oldVal: HTMLAudioElement) {
-    newVal.addEventListener("timeupdate", ev => {
-      this.progress =
-        (this.audio.currentTime.toFixed() * 100) /
-        this.audio.duration.toFixed();
-    });
+  handlePlay() {
+    if (this.audioState === "playing") {
+      this.audio.pause();
+    } else {
+      this.audio.play();
+    }
   }
 
-  // get progress() {
-  //   return (this.audio.currentTime * 100) / this.audio.duration;
-  // }
+  refreshProgress() {
+    // console.log("refreshProgress");
+    // console.log({ audio: this.audio.currentTime });
+    const currentTime = this.audio.currentTime;
+    const aux = (currentTime.toFixed(2) * 100) / this.duration;
+    this.progress = isNaN(aux) ? 0 : aux;
 
-  // async setAudio() {
-  //   // const fetchAudio64 = await this.$store.dispatch(
-  //   //   "folder/fetchAudio64",
-  //   //   // @ts-ignore
-  //   //   this.selectedSong.path
-  //   // );
-  //   // this.audio = new Audio(`data:audio/x-wav;base64, ${fetchAudio64}`);
-  //   // console.log({ audio: this.audio });
-  //   // audio.play();
-  //   // myaudio.play(); - This will play the music.
-  //   // myaudio.pause(); - This will stop the music.
-  //   // myaudio.duration; - Returns the length of the music track.
-  //   // myaudio.currentTime = 0; - This will rewind the audio to the beginning.
-  //   // myaudio.loop = true; - This will make the audio track loop.
-  //   // myaudio.muted = true; - This will mute the track
-  //   // let audio = new Audio("data:audio/wav;base64," + base64string);
-  // }
+    this.currentTimeVal = parseSecondsToHuman(currentTime);
+  }
+
+  refreshDuration() {
+    this.duration = this.audio.duration;
+    this.totalTimeVal = parseSecondsToHuman(this.duration);
+  }
+
+  handleEnded() {
+    if (this.playingNext) {
+      this.playNext();
+    }
+  }
+
+  refreshAudioInfo() {
+    // console.log("refreshAudioInfo");
+    // console.log({ audio: this.audio });
+
+    if (this.audio.paused) {
+      this.audioState = "paused";
+    }
+    if (this.audio.ended) {
+      this.audioState = "stoped";
+    }
+    if (!this.audio.paused && !this.audio.ended) {
+      this.audioState = "playing";
+    }
+    this.$store.commit("audio/setAudioState", this.audioState);
+  }
+
+  @Watch("audio")
+  audioListeners(newVal: HTMLAudioElement, oldVal: HTMLAudioElement) {
+    // console.log({ oldVal });
+    const eventsAudioState = ["play", "pause", "ended"];
+
+    if (oldVal) {
+      oldVal.pause();
+      oldVal.removeEventListener("loadedmetadata", this.refreshDuration);
+      oldVal.removeEventListener("timeupdate", this.refreshProgress);
+      oldVal.removeEventListener("ended", this.handleEnded);
+      eventsAudioState.forEach(ev => {
+        oldVal.removeEventListener(ev, this.refreshAudioInfo);
+      });
+    }
+    if (newVal) {
+      newVal.addEventListener("loadedmetadata", this.refreshDuration);
+      newVal.addEventListener("timeupdate", this.refreshProgress);
+      newVal.addEventListener("ended", this.handleEnded);
+      eventsAudioState.forEach(ev => {
+        newVal.addEventListener(ev, this.refreshAudioInfo);
+      });
+    }
+    this.refreshProgress();
+    this.refreshAudioInfo();
+  }
 }
 </script>
 
