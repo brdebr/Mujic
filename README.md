@@ -1,29 +1,31 @@
-# mujic
+# Mujic
 
-## Project setup
+## 🔨 Project setup
 ```
-npm install
-```
-
-### Compiles and hot-reloads for development
-```
-npm run serve
+npm i
 ```
 
-### Compiles and minifies for production
+### 💻 · Serve electron with hot-reload
 ```
-npm run build
+npm run dev
 ```
 
-### Run your unit tests
+### 🖼 · Generate icon for production build
+```
+npm run electron:generate-icons
+```
+
+### 📦 · Compiles and minifies for production
+```
+npm run electron:serve
+```
+
+### ✅ · Run your unit tests
 ```
 npm run test:unit
 ```
 
-### Lints and fixes files
+### ✍ · Lints and fixes files
 ```
 npm run lint
 ```
-
-### Customize configuration
-See [Configuration Reference](https://cli.vuejs.org/config/).
