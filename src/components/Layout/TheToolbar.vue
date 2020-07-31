@@ -27,14 +27,7 @@
     </v-toolbar-title>
     <v-spacer />
     <OpenFolder />
-    <v-btn depressed>
-      <v-icon class="mr-2" size="20">
-        fab fa-youtube
-      </v-icon>
-      <span style="padding-top: 1px">
-        Download
-      </span>
-    </v-btn>
+    <OpenDownload />
   </v-app-bar>
 </template>
 <script lang="ts">
@@ -42,10 +35,12 @@ import Vue from "vue";
 import Component from "vue-class-component";
 import { ipcRenderer } from "electron";
 import OpenFolder from "@/components/Actions/OpenFolder.vue";
+import OpenDownload from "@/components/Actions/OpenDownload.vue";
 
 @Component({
   components: {
-    OpenFolder
+    OpenFolder,
+    OpenDownload
   }
 })
 export default class extends Vue {}

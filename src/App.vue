@@ -9,6 +9,7 @@
         </transition>
       </v-container>
       <AudioControls :audio="$store.state.audio.audio" />
+      <DownloadDialog :value="this.$store.state.download.dialog" />
     </v-main>
   </v-app>
 </template>
@@ -17,6 +18,7 @@
 import TheDrawer from "@/components/Layout/TheDrawer.vue";
 import TheToolbar from "@/components/Layout/TheToolbar.vue";
 import AudioControls from "@/components/App/AudioControls.vue";
+import DownloadDialog from "@/components/Dialogs/DownloadDialog.vue";
 
 export default {
   name: "App",
@@ -26,7 +28,8 @@ export default {
   components: {
     TheToolbar,
     TheDrawer,
-    AudioControls
+    AudioControls,
+    DownloadDialog
   },
   mounted() {
     // this.$store.commit('app/fetchInstances');
