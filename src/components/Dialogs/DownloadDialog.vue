@@ -21,6 +21,7 @@
               :rounded="!inputShaped"
               :shaped="inputShaped"
               prepend-inner-icon="fas fa-external-link-alt"
+              append-icon="fas fa-download"
             />
           </v-col>
         </v-row>

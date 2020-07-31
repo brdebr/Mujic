@@ -29,3 +29,6 @@ npm run test:unit
 ```
 npm run lint
 ```
+
+Remove ternary at 
+node_modules\fluent-ffmpeg\index.js

@@ -2,11 +2,13 @@ import { ipcMain, dialog } from "electron";
 import fs from "fs";
 import path from "path";
 import { SongFileI } from "@/store/folder";
+import YDMp3 from '@/main/YtDownloader';
 
 enum IpcEventNames {
   dialogGetFolder = "dialogGetFolder",
   getSongFiles = "getSongFiles",
   getSongBase64 = "getSongBase64",
+  downloadYT = "downloadYT",
 }
 
 export default class IpcManager {
@@ -63,6 +65,17 @@ export default class IpcManager {
       IpcEventNames.getSongBase64,
       async (event, songPath: string) => {
         return await fs.promises.readFile(songPath, { encoding: "base64" });
+      }
+    );
+
+    ipcMain.handle(
+      IpcEventNames.downloadYT,
+      async (event, videoUrl: string) => {
+        const videoURL = new URL(videoUrl);
+        const videoId = videoURL.searchParams.get("v") || '';
+        if(videoUrl){
+          YDMp3.download(videoId);
+        }
       }
     );
   }

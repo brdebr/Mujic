@@ -1,5 +1,5 @@
-const YoutubeMp3Downloader = require("youtube-mp3-downloader");
- 
+import YoutubeMp3Downloader from 'youtube-mp3-downloader';
+
 //Configure YoutubeMp3Downloader with your settings
 const YDMp3 = new YoutubeMp3Downloader({
     "ffmpegPath": "L:/Libs/ffmpeg/bin/ffmpeg.exe",          // FFmpeg binary location
