@@ -53,9 +53,19 @@ export default class DownloadDialog extends Vue {
 </script>
 
 <style lang="scss">
+.video-prev {
+  border-top-left-radius: 0 !important;
+  border-top-right-radius: 0 !important;
+}
+.bg-above-img-1 {
+  background-color: transparentize(#000, 0.28);
+}
+.bg-above-img-2 {
+  background-color: transparentize(#000, 0.18);
+}
 .field-fix-prepend-inner {
-  &.v-input--is-label-active,
-  &.v-input--is-focused {
+  &.v-input--is-label-active {
+    // ROUND A
     &.v-text-field--rounded {
       .v-input__slot {
         .v-input__prepend-inner {
@@ -64,25 +74,19 @@ export default class DownloadDialog extends Vue {
         }
         fieldset {
           legend {
-            width: 85px !important;
+            width: 105px !important;
           }
         }
       }
-      &.v-input--is-focused {
-        .v-input__slot {
-          fieldset {
-            legend {
-              width: 105px !important;
-            }
-          }
-        }
-        .v-text-field__slot {
-          label {
-            padding-left: 10px;
-          }
+      .v-text-field__slot {
+        label {
+          display: inline-block;
+          padding-left: 10px !important;
+          margin-left: 0px !important;
         }
       }
     }
+    // SHAPED A
     &.v-text-field--shaped {
       .v-input__slot {
         padding-top: 1px;
@@ -93,27 +97,87 @@ export default class DownloadDialog extends Vue {
         }
         fieldset {
           legend {
-            width: 95px !important;
+            width: 90px !important;
           }
         }
       }
       .v-text-field__slot {
         label {
-          padding-left: 13px;
+          display: inline-block;
+          padding-left: 13px !important;
+          margin-left: -12px !important;
         }
       }
-      &.v-input--is-focused {
-        .v-input__slot {
-          fieldset {
-            legend {
-              width: 110px !important;
-            }
+    }
+  }
+  // ROUND
+  &.v-text-field--rounded {
+    .v-input__slot {
+      .v-input__prepend-inner {
+        margin-right: 12px;
+        margin-top: 14px;
+      }
+    }
+    .v-text-field__slot {
+      label {
+        display: inline-block;
+        padding-left: 0px !important;
+        margin-left: -5px !important;
+      }
+    }
+  }
+  // SHAPED
+  &.v-text-field--shaped {
+    .v-input__slot {
+      padding-top: 1px;
+      .v-input__prepend-inner {
+        margin-right: 12px;
+        margin-top: 14px;
+        margin-left: 5px;
+      }
+    }
+    .v-text-field__slot {
+      label {
+        display: inline-block;
+        padding-left: -10px !important;
+        margin-left: -5px !important;
+      }
+    }
+  }
+  // FOCUS
+
+  &.v-input--is-focused {
+    // ROUND F
+    &.v-text-field--rounded {
+      .v-input__slot {
+        fieldset {
+          legend {
+            width: 120px !important;
           }
         }
-        .v-text-field__slot {
-          label {
-            padding-left: 13px;
+      }
+      .v-text-field__slot {
+        label {
+          display: inline-block;
+          padding-left: 10px !important;
+          margin-left: 10px !important;
+        }
+      }
+    }
+    // SHAPED F
+    &.v-text-field--shaped {
+      .v-input__slot {
+        fieldset {
+          legend {
+            width: 130px !important;
           }
+        }
+      }
+      .v-text-field__slot {
+        label {
+          display: inline-block;
+          padding-left: 13px !important;
+          margin-left: 10px !important;
         }
       }
     }
