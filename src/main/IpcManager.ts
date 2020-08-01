@@ -1,22 +1,22 @@
-import { ipcMain, dialog } from "electron";
+import { ipcMain, dialog, BrowserWindow } from "electron";
 import fs from "fs";
 import path from "path";
 import { SongFileI } from "@/store/folder";
-import YDMp3 from '@/main/YtDownloader';
+import YDMp3 from "@/main/YtDownloader";
 
-enum IpcEventNames {
+export enum IpcEventNames {
   dialogGetFolder = "dialogGetFolder",
   getSongFiles = "getSongFiles",
   getSongBase64 = "getSongBase64",
-  downloadYT = "downloadYT",
+  downloadYT = "downloadYT"
 }
 
 export default class IpcManager {
-  static initListeners() {
+  static initListeners(win: BrowserWindow) {
     ipcMain.handle(IpcEventNames.dialogGetFolder, async () => {
-      let selection = await dialog.showOpenDialog({
+      const selection = await dialog.showOpenDialog({
         properties: ["openDirectory"],
-        title: "Music folder",
+        title: "Music folder"
       });
       if (selection.canceled) {
         return "";
@@ -28,16 +28,16 @@ export default class IpcManager {
       IpcEventNames.getSongFiles,
       async (event, folderPath: string) => {
         // console.log(`getSongFiles(${folderPath})`);
-        let extensions = [".mp3", ".ogg", ".wav"];
+        const extensions = [".mp3", ".ogg", ".wav"];
         return fs
           .readdirSync(folderPath, { withFileTypes: true })
           .filter(
-            (el) => el.isFile() && extensions.includes(path.extname(el.name))
+            el => el.isFile() && extensions.includes(path.extname(el.name))
           )
-          .map((el) => {
-            let fullPath = path.join(folderPath, el.name);
-            let extension = path.extname(el.name);
-            let {
+          .map(el => {
+            const fullPath = path.join(folderPath, el.name);
+            const extension = path.extname(el.name);
+            const {
               size,
               atimeMs,
               mtimeMs,
@@ -53,9 +53,9 @@ export default class IpcManager {
                 atimeMs,
                 mtimeMs,
                 ctimeMs,
-                birthtimeMs,
+                birthtimeMs
               },
-              name: path.basename(el.name, extension),
+              name: path.basename(el.name, extension)
             } as SongFileI;
           });
       }
@@ -68,15 +68,27 @@ export default class IpcManager {
       }
     );
 
-    ipcMain.handle(
-      IpcEventNames.downloadYT,
-      async (event, videoUrl: string) => {
-        const videoURL = new URL(videoUrl);
-        const videoId = videoURL.searchParams.get("v") || '';
-        if(videoUrl){
-          YDMp3.download(videoId);
-        }
+    ipcMain.on(IpcEventNames.downloadYT, async (event, videoUrl: string) => {
+      const videoURL = new URL(videoUrl);
+      const videoId = videoURL.searchParams.get("v") || "";
+      if (videoUrl) {
+        YDMp3.download(videoId);
+
+        YDMp3.on("finished", function(err, data) {
+          event.reply("download-finished", true);
+          console.log(JSON.stringify(data));
+        });
+
+        YDMp3.on("error", function(error) {
+          event.reply("download-error", true);
+          console.log(error);
+        });
+
+        YDMp3.on("progress", function(info) {
+          event.reply("download-progress", info.progress.percentage);
+          // console.log(JSON.stringify(info));
+        });
       }
-    );
+    });
   }
 }

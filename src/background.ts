@@ -49,9 +49,10 @@ async function createWindow() {
     win = null;
   });
 
-  IpcManager.initListeners();
+  IpcManager.initListeners(win);
 
 }
+app.commandLine.appendSwitch('disable-web-security'); 
 
 // Quit when all windows are closed.
 app.on("window-all-closed", () => {

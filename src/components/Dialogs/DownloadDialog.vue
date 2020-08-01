@@ -1,5 +1,5 @@
 <template>
-  <v-dialog :value="value">
+  <v-dialog :value="value" max-width="1150px">
     <v-card>
       <v-card-title>
         Download from Youtube as MP3
@@ -8,6 +8,12 @@
         </v-btn>
       </v-card-title>
       <v-divider />
+      <v-progress-linear
+        v-if="!!videoObj.title"
+        :value="progress"
+        color="red darken-2"
+        height="8"
+      />
       <v-card-text class="pt-5">
         <v-row no-gutters class="flex-wrap">
           <v-col cols="12">
@@ -16,13 +22,37 @@
               label="Video URL"
               messages="lorem impsum"
               class="field-fix-prepend-inner"
-              :hide-details="inputShaped"
+              :hide-details="true"
               outlined
               :rounded="!inputShaped"
-              :shaped="inputShaped"
+              :shaped="!!videoObj.title"
               prepend-inner-icon="fas fa-external-link-alt"
               append-icon="fas fa-download"
+              @click:append="test"
             />
+          </v-col>
+          <v-col cols="12" v-if="videoObj.title">
+            <v-card class="video-prev">
+              <v-img
+                class="white--text align-end"
+                height="240px"
+                :src="videoObj.imageUrl"
+              >
+                <v-card-title class="bg-above-img-1 py-3 px-5">
+                  <div>
+                    {{ videoObj.title }}
+                  </div>
+                  <div class="ml-auto">
+                    <v-icon color="red accent-4">
+                      fab fa-youtube
+                    </v-icon>
+                  </div>
+                </v-card-title>
+                <v-card-text class="bg-above-img-2 pt-3">
+                  {{ videoObj.description }}
+                </v-card-text>
+              </v-img>
+            </v-card>
           </v-col>
         </v-row>
       </v-card-text>
@@ -34,17 +64,73 @@
 import Vue from "vue";
 import Component from "vue-class-component";
 import { Prop, Watch } from "vue-property-decorator";
+import { ipcRenderer } from "electron";
+import { IpcEventNames } from "@/main/IpcManager";
+
+import axios from "axios";
+
+interface VideoObj {
+  title: string;
+  imageUrl: string;
+  description: string;
+}
 
 @Component({})
 export default class DownloadDialog extends Vue {
   @Prop()
   value!: boolean;
 
-  @Watch("videoUrl")
-  test() {
-    const videoo = "https://www.youtube.com/watch?v=NpkDLCo8O8k";
-    const uu = new URL("https://www.youtube.com/watch?v=NpkDLCo8O8k");
-    console.log(uu.searchParams.get("v"));
+  videoObj: VideoObj = {
+    title: "",
+    imageUrl: "",
+    description: ""
+  };
+
+  progress = 0;
+
+  async test() {
+    await this.fetchPreview();
+    ipcRenderer.send(IpcEventNames.downloadYT, this.videoUrl);
+  }
+
+  mounted() {
+    ipcRenderer.on("download-progress", (event, arg) => {
+      this.progress = arg;
+      console.log(arg);
+    });
+  }
+
+  destroyed() {
+    ipcRenderer.removeAllListeners("download-progress");
+  }
+
+  async fetchPreview() {
+    // const folderPath = await ipcRenderer.invoke(
+    //   IpcEventNames.downloadYT,
+    //   this.videoUrl
+    // );
+
+    const resp = await axios.get(this.videoUrl);
+    if (resp.status == 200) {
+      const previewPageHTML = resp.data;
+
+      const doc = new DOMParser().parseFromString(previewPageHTML, "text/html");
+
+      this.videoObj.title =
+        doc
+          .querySelector('meta[property="og:title"]')
+          ?.attributes?.getNamedItem("content")?.value || "";
+
+      this.videoObj.imageUrl =
+        doc
+          .querySelector('meta[property="og:image"]')
+          ?.attributes?.getNamedItem("content")?.value || "";
+
+      this.videoObj.description =
+        doc
+          .querySelector('meta[property="og:description"]')
+          ?.attributes?.getNamedItem("content")?.value || "";
+    }
   }
 
   inputShaped = false;
