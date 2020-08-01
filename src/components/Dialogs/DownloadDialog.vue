@@ -1,15 +1,16 @@
 <template>
-  <v-dialog :value="value" max-width="1150px">
+  <v-dialog
+    :value="value"
+    max-width="1150px"
+    @input="v => $store.commit('download/setDialog', v)"
+  >
     <v-card :loading="loading">
       <v-card-title>
         Download from Youtube as MP3
-        <v-btn @click="inputShaped = !inputShaped">
-          aa
-        </v-btn>
       </v-card-title>
       <v-divider />
       <v-progress-linear
-        v-if="videoObj$ && !!videoObj$.title"
+        v-if="progress > 0"
         :value="progress"
         color="red darken-2"
         striped
@@ -21,18 +22,41 @@
             <v-text-field
               v-model="videoUrl"
               label="Video URL"
+              color="red darken-2"
               messages="lorem impsum"
               class="field-fix-prepend-inner"
-              :hide-details="true"
+              hide-details
               outlined
-              :rounded="!inputShaped"
-              :shaped="videoObj$ && !!videoObj$.title"
+              :rounded="!isYoutube(videoObj$)"
+              :shaped="isYoutube(videoObj$)"
               prepend-inner-icon="fas fa-external-link-alt"
-              append-icon="fas fa-download"
-              @click:append="download"
-            />
+              :disabled="progress > 0"
+            >
+              <template #append>
+                <v-btn v-if="!isYoutube(videoObj$)" disabled outlined icon>
+                  <v-icon size="18">
+                    fas fa-download
+                  </v-icon>
+                </v-btn>
+                <v-btn
+                  v-if="isYoutube(videoObj$)"
+                  @click="download"
+                  depressed
+                  dark
+                  :disabled="progress > 0"
+                  color="red accent-4"
+                >
+                  <v-icon size="14" class="mr-3">
+                    fas fa-download
+                  </v-icon>
+                  <span>
+                    Download
+                  </span>
+                </v-btn>
+              </template>
+            </v-text-field>
           </v-col>
-          <v-col cols="12" v-if="videoObj$">
+          <v-col cols="12" v-if="isYoutube(videoObj$)">
             <v-card class="video-prev">
               <v-img
                 class="white--text align-end"
@@ -84,9 +108,11 @@ import axios from "axios";
 import { from, of } from "rxjs";
 
 export interface VideoObj {
+  siteName: string;
   title: string;
   imageUrl: string;
   description: string;
+  videoUrl: string;
 }
 
 @Component<DownloadDialog>({
@@ -107,7 +133,7 @@ export interface VideoObj {
           this.loading = true;
         }),
         switchMap(val => {
-          return from(axios.get(val)).pipe(
+          return from(axios.get<string>(val)).pipe(
             catchError((err, caught) => {
               this.loading = false;
               return of({
@@ -116,15 +142,31 @@ export interface VideoObj {
             })
           );
         }),
-        filter(val => val.status === 200),
+        map(val => {
+          if (val.status === 200) {
+            return val;
+          } else {
+            return {
+              data: ""
+            };
+          }
+        }),
         pluck("data"),
         map(val => new DOMParser().parseFromString(val, "text/html")),
         map(doc => {
           const returnObj: VideoObj = {
+            siteName: "",
             title: "",
             imageUrl: "",
-            description: ""
+            description: "",
+            videoUrl: ""
           };
+
+          returnObj.siteName =
+            doc
+              .querySelector('meta[property="og:site_name"]')
+              ?.attributes?.getNamedItem("content")?.value || "";
+
           returnObj.title =
             doc
               .querySelector('meta[property="og:title"]')
@@ -140,6 +182,11 @@ export interface VideoObj {
               .querySelector('meta[property="og:description"]')
               ?.attributes?.getNamedItem("content")?.value || "";
 
+          returnObj.videoUrl =
+            doc
+              .querySelector('meta[property="og:video:url"]')
+              ?.attributes?.getNamedItem("content")?.value || "";
+
           return returnObj;
         }),
         tap(val => {
@@ -153,29 +200,35 @@ export default class DownloadDialog extends Vue {
   @Prop()
   value!: boolean;
 
-  // $videoObj!: any;
-
   loading = false;
 
   progress = 0;
 
-  inputShaped = false;
-
   videoUrl = "";
 
+  locked = true;
+
   download() {
-    console.log("fu");
+    ipcRenderer.send(IpcEventNames.downloadYT, this.videoUrl);
+    this.progress = 1;
+  }
+
+  isYoutube(obj: VideoObj) {
+    return obj?.siteName === "YouTube";
   }
 
   mounted() {
     ipcRenderer.on("download-progress", (event, arg) => {
       this.progress = arg;
-      console.log(arg);
+    });
+    ipcRenderer.on("download-finished", (event, arg) => {
+      this.progress = 0;
     });
   }
 
   destroyed() {
     ipcRenderer.removeAllListeners("download-progress");
+    ipcRenderer.removeAllListeners("download-finished");
   }
 }
 </script>
@@ -240,6 +293,20 @@ export default class DownloadDialog extends Vue {
   }
   // ROUND
   &.v-text-field--rounded {
+    .v-input__append-inner {
+      margin-top: auto;
+      margin-bottom: auto;
+      margin-right: -17px;
+      margin-left: -4px;
+      button.v-btn {
+        height: 42px;
+        width: 42px;
+        .v-icon {
+          padding-bottom: 2px;
+          padding-left: 1px;
+        }
+      }
+    }
     .v-input__slot {
       .v-input__prepend-inner {
         margin-right: 12px;
@@ -262,6 +329,14 @@ export default class DownloadDialog extends Vue {
         margin-right: 12px;
         margin-top: 14px;
         margin-left: 5px;
+      }
+      .v-input__append-inner {
+        margin-right: -2px;
+        margin-top: auto;
+        margin-bottom: auto;
+        button.v-btn {
+          border-radius: 0px 10px 0px 0px;
+        }
       }
     }
     .v-text-field__slot {

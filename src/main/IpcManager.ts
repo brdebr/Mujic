@@ -75,7 +75,7 @@ export default class IpcManager {
         YDMp3.download(videoId);
 
         YDMp3.on("finished", function(err, data) {
-          event.reply("download-finished", true);
+          event.reply("download-finished", data);
           console.log(JSON.stringify(data));
         });
 
