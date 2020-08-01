@@ -5,6 +5,8 @@ import installExtension, { VUEJS_DEVTOOLS } from 'electron-devtools-installer';
 import { createProtocol } from "vue-cli-plugin-electron-builder/lib";
 import IpcManager from '@/main/IpcManager';
 import path from 'path'
+import fs from 'fs';
+import { downloadFfmpeg } from '@/main/DownloadFfmpeg';
 const isDevelopment = process.env.NODE_ENV !== "production";
 
 // Keep a global reference of the window object, if you don't, the window will
@@ -54,9 +56,24 @@ async function createWindow() {
   });
 
   let appPath = process.env.PORTABLE_EXECUTABLE_DIR || __dirname // === dist_electron
-  let ffmpegPath = process.env.FFMPEG_PATH || "L:/Libs/ffmpeg/bin/ffmpeg.exe"
+  // let ffmpegPath = process.env.FFMPEG_PATH || "L:/Libs/ffmpeg/bin/ffmpeg.exe"
 
-  IpcManager.initListeners(win, appPath, ffmpegPath);
+  let ffmpegFilePath = path.join(appPath, 'ffmpeg.exe')
+  
+  try {
+    let ffmpegFile = await fs.promises.readFile(ffmpegFilePath);
+    if(ffmpegFile.length <= 250) throw new Error('File too small');
+  } catch (error) {
+    console.log('FFPEG NOT FOUND');
+    console.log('-- DOWNLOADING ---');
+    try {
+      await downloadFfmpeg(appPath)
+      console.log('--- DONE ---');
+    } catch (downloadError) {
+      console.log({downloadError});
+    }
+  }
+  IpcManager.initListeners(win, appPath, ffmpegFilePath);
 
 }
 app.commandLine.appendSwitch('disable-web-security'); 
