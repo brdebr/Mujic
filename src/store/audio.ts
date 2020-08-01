@@ -1,6 +1,7 @@
 import { Module } from "vuex";
 import { ipcRenderer } from "electron";
 import { SongFileI } from "@/store/folder";
+import { IpcEventNames } from "@/main/IpcManager";
 
 export interface AudioStateI {
   state: "playing" | "paused" | "stopped";
@@ -36,7 +37,7 @@ const AudioStoreModule: Module<AudioStateI, any> = {
       // console.log({ song });
       ctx.commit(
         "setBase64",
-        await ipcRenderer.invoke("getSongBase64", song.path)
+        await ipcRenderer.invoke(IpcEventNames.getSongBase64, song.path)
       );
       ctx.commit("initAudio");
     }

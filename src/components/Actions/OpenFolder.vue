@@ -14,13 +14,14 @@ import Vue from "vue";
 import Component from "vue-class-component";
 import { ipcRenderer } from "electron";
 import { Prop } from "vue-property-decorator";
+import { IpcEventNames } from "@/main/IpcManager";
 
 @Component({
   components: {}
 })
 export default class OpenFolder extends Vue {
   async openFolder() {
-    const folderPath = await ipcRenderer.invoke("dialogGetFolder");
+    const folderPath = await ipcRenderer.invoke(IpcEventNames.dialogGetFolder);
     this.$store.dispatch("folder/fetchSongFiles", folderPath);
   }
   @Prop()

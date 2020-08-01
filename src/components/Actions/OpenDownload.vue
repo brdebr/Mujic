@@ -1,5 +1,11 @@
 <template>
-  <v-btn depressed class="mr-4" @click="openDownload" :dark="dark">
+  <v-btn
+    depressed
+    class="mr-4"
+    @click="openDownload"
+    :dark="dark"
+    :disabled="!$store.state.folder.folderName"
+  >
     <v-icon class="mr-2" size="20">
       fab fa-youtube
     </v-icon>

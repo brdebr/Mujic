@@ -19,13 +19,13 @@ protocol.registerSchemesAsPrivileged([
 async function createWindow() {
   // Create the browser window.
   win = new BrowserWindow({
+    title: 'Mujic',
     width: 1450,
     height: 820,
     minWidth: 800,
     minHeight: 720,
     maxWidth: 1800,
     maxHeight: 1000,
-    title: 'Mujic',
     // @ts-ignore
     icon: path.join(__static, 'icon.png'),
     webPreferences: {
@@ -53,7 +53,10 @@ async function createWindow() {
     win = null;
   });
 
-  IpcManager.initListeners(win);
+  let appPath = process.env.PORTABLE_EXECUTABLE_DIR || __dirname // === dist_electron
+  let ffmpegPath = process.env.FFMPEG_PATH || "L:/Libs/ffmpeg/bin/ffmpeg.exe"
+
+  IpcManager.initListeners(win, appPath, ffmpegPath);
 
 }
 app.commandLine.appendSwitch('disable-web-security'); 

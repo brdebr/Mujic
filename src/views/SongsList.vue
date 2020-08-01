@@ -18,7 +18,11 @@
           bench="1"
           :item-height="61"
           height="510"
-          v-if="$store.state.folder.folderName && !$store.state.folder.loading"
+          v-if="
+            $store.state.folder.folderName &&
+              !$store.state.folder.loading &&
+              $store.state.folder.songFiles.length
+          "
         >
           <template #default="{ item, index }">
             <v-list-item
@@ -82,6 +86,22 @@
           </v-row>
         </v-card-text>
         <v-card-text
+          v-if="
+            $store.state.folder.folderName &&
+              !$store.state.folder.loading &&
+              !$store.state.folder.songFiles.length
+          "
+        >
+          <v-row no-gutters class="flex-wrap">
+            <v-col cols="12" class="text-center pb-2 pt-1 subtitle-1">
+              This folder is empty, start adding songs from Youtube
+            </v-col>
+            <v-col cols="12" class="text-center py-3">
+              <OpenDownload dark />
+            </v-col>
+          </v-row>
+        </v-card-text>
+        <v-card-text
           v-if="$store.state.folder.loading"
           class="text-center subtitle-1 pb-2 pt-1"
         >
@@ -95,13 +115,15 @@
 <script lang="ts">
 import Vue from "vue";
 import Component from "vue-class-component";
-import OpenFolder from "../components/Actions/OpenFolder.vue";
+import OpenFolder from "@/components/Actions/OpenFolder.vue";
 
 import moment from "moment";
+import OpenDownload from "@/components/Actions/OpenDownload.vue";
 
 @Component({
   components: {
-    OpenFolder
+    OpenFolder,
+    OpenDownload
   }
 })
 export default class SongsList extends Vue {

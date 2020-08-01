@@ -214,7 +214,11 @@ export default class DownloadDialog extends Vue {
   locked = true;
 
   download() {
-    ipcRenderer.send(IpcEventNames.downloadYT, this.videoUrl);
+    ipcRenderer.send(
+      IpcEventNames.downloadYT,
+      this.videoUrl,
+      this.$store.state.folder.folderName
+    );
     this.progress = 1;
   }
 
@@ -227,7 +231,15 @@ export default class DownloadDialog extends Vue {
       this.progress = arg;
     });
     ipcRenderer.on("download-finished", (event, arg) => {
-      this.progress = 100;
+      this.progress = 0;
+      this.videoUrl = "";
+      this.loading = false;
+      this.locked = true;
+      this.$store.commit("download/setDialog", false);
+      this.$store.dispatch(
+        "folder/fetchSongFiles",
+        this.$store.state.folder.folderName
+      );
     });
   }
 

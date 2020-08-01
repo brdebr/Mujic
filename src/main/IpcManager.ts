@@ -2,7 +2,7 @@ import { ipcMain, dialog, BrowserWindow } from "electron";
 import fs from "fs";
 import path from "path";
 import { SongFileI } from "@/store/folder";
-import YDMp3 from "@/main/YtDownloader";
+import { buildDownloader } from "@/main/YtDownloader";
 
 export enum IpcEventNames {
   dialogGetFolder = "dialogGetFolder",
@@ -12,7 +12,11 @@ export enum IpcEventNames {
 }
 
 export default class IpcManager {
-  static initListeners(win: BrowserWindow) {
+  static initListeners(
+    win: BrowserWindow,
+    appPath: string,
+    ffmpegPath: string
+  ) {
     ipcMain.handle(IpcEventNames.dialogGetFolder, async () => {
       const selection = await dialog.showOpenDialog({
         properties: ["openDirectory"],
@@ -68,27 +72,31 @@ export default class IpcManager {
       }
     );
 
-    ipcMain.on(IpcEventNames.downloadYT, async (event, videoUrl: string) => {
-      const videoURL = new URL(videoUrl);
-      const videoId = videoURL.searchParams.get("v") || "";
-      if (videoUrl) {
-        YDMp3.download(videoId);
+    ipcMain.on(
+      IpcEventNames.downloadYT,
+      async (event, videoUrl: string, path: string) => {
+        const videoURL = new URL(videoUrl);
+        const videoId = videoURL.searchParams.get("v") || "";
+        if (videoUrl) {
+          const YDMp3 = buildDownloader(ffmpegPath, path);
+          YDMp3.download(videoId);
 
-        YDMp3.on("finished", function(err, data) {
-          event.reply("download-finished", data);
-          console.log(JSON.stringify(data));
-        });
+          YDMp3.on("finished", function(err, data) {
+            event.reply("download-finished", data);
+            // console.log(JSON.stringify(data));
+          });
 
-        YDMp3.on("error", function(error) {
-          event.reply("download-error", true);
-          console.log(error);
-        });
+          YDMp3.on("error", function(error) {
+            event.reply("download-error", true);
+            console.log(error);
+          });
 
-        YDMp3.on("progress", function(info) {
-          event.reply("download-progress", info.progress.percentage);
-          // console.log(JSON.stringify(info));
-        });
+          YDMp3.on("progress", function(info) {
+            event.reply("download-progress", info.progress.percentage);
+            // console.log(JSON.stringify(info));
+          });
+        }
       }
-    });
+    );
   }
 }

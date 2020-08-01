@@ -1,5 +1,6 @@
 import { Module } from "vuex";
 import { ipcRenderer } from "electron";
+import { IpcEventNames } from "@/main/IpcManager";
 
 export interface FolderStateI {
   folderName: string;
@@ -59,9 +60,15 @@ const FolderStoreModule: Module<FolderStateI, any> = {
     async fetchSongFiles(ctx, folderPath) {
       ctx.commit("setFolderName", folderPath);
       ctx.commit("setLoading", true);
-      const songFiles = await ipcRenderer.invoke("getSongFiles", folderPath);
-      ctx.commit("setSongFiles", songFiles);
-      await ctx.dispatch("selectSongByIndex", 0);
+      const songFiles: SongFileI[] = await ipcRenderer.invoke(
+        IpcEventNames.getSongFiles,
+        folderPath
+      );
+      if (songFiles.length) {
+        ctx.commit("setSongFiles", songFiles);
+        await ctx.dispatch("selectSongByIndex", 0);
+      }
+
       ctx.commit("setLoading", false);
     }
   }
