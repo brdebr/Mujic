@@ -4,6 +4,7 @@ import { app, protocol, BrowserWindow } from "electron";
 import installExtension, { VUEJS_DEVTOOLS } from 'electron-devtools-installer';
 import { createProtocol } from "vue-cli-plugin-electron-builder/lib";
 import IpcManager from '@/main/IpcManager';
+import path from 'path'
 const isDevelopment = process.env.NODE_ENV !== "production";
 
 // Keep a global reference of the window object, if you don't, the window will
@@ -24,6 +25,9 @@ async function createWindow() {
     minHeight: 720,
     maxWidth: 1800,
     maxHeight: 1000,
+    title: 'Mujic',
+    // @ts-ignore
+    icon: path.join(__static, 'icon.png'),
     webPreferences: {
       nodeIntegration: true
     }

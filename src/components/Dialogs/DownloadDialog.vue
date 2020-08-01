@@ -27,19 +27,19 @@
               class="field-fix-prepend-inner"
               hide-details
               outlined
-              :rounded="!isYoutube(videoObj$)"
-              :shaped="isYoutube(videoObj$)"
+              :rounded="locked"
+              :shaped="!locked"
               prepend-inner-icon="fas fa-external-link-alt"
               :disabled="progress > 0"
             >
               <template #append>
-                <v-btn v-if="!isYoutube(videoObj$)" disabled outlined icon>
+                <v-btn v-if="locked" disabled outlined icon>
                   <v-icon size="18">
                     fas fa-download
                   </v-icon>
                 </v-btn>
                 <v-btn
-                  v-if="isYoutube(videoObj$)"
+                  v-if="!locked"
                   @click="download"
                   depressed
                   dark
@@ -56,7 +56,7 @@
               </template>
             </v-text-field>
           </v-col>
-          <v-col cols="12" v-if="isYoutube(videoObj$)">
+          <v-col cols="12" v-if="!locked">
             <v-card class="video-prev">
               <v-img
                 class="white--text align-end"
@@ -87,7 +87,6 @@
 
 <script lang="ts">
 import Vue from "vue";
-import VueRx from "vue-rx";
 import Component from "vue-class-component";
 import { Prop, Watch } from "vue-property-decorator";
 import { ipcRenderer } from "electron";
@@ -120,8 +119,11 @@ export interface VideoObj {
     return {
       videoObj$: this.$watchAsObservable("videoUrl").pipe(
         pluck("newValue"),
-        filter(val => !!val),
         distinctUntilChanged(),
+        tap(val => {
+          if (!val) this.locked = true;
+        }),
+        filter(val => !!val),
         debounceTime(500),
         map(val => {
           return new URL(val).toString();
@@ -129,13 +131,14 @@ export interface VideoObj {
         catchError((err, caught) => {
           return caught;
         }),
-        tap(val => {
+        tap(() => {
           this.loading = true;
         }),
         switchMap(val => {
           return from(axios.get<string>(val)).pipe(
-            catchError((err, caught) => {
+            catchError(() => {
               this.loading = false;
+              this.locked = true;
               return of({
                 status: -1
               });
@@ -146,12 +149,14 @@ export interface VideoObj {
           if (val.status === 200) {
             return val;
           } else {
+            this.locked = true;
             return {
               data: ""
             };
           }
         }),
         pluck("data"),
+        filter(val => !!val),
         map(val => new DOMParser().parseFromString(val, "text/html")),
         map(doc => {
           const returnObj: VideoObj = {
@@ -186,10 +191,10 @@ export interface VideoObj {
             doc
               .querySelector('meta[property="og:video:url"]')
               ?.attributes?.getNamedItem("content")?.value || "";
-
+          if (this.isYoutube(returnObj)) this.locked = false;
           return returnObj;
         }),
-        tap(val => {
+        tap(() => {
           this.loading = false;
         })
       )
@@ -222,7 +227,7 @@ export default class DownloadDialog extends Vue {
       this.progress = arg;
     });
     ipcRenderer.on("download-finished", (event, arg) => {
-      this.progress = 0;
+      this.progress = 100;
     });
   }
 
