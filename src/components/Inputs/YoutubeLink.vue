@@ -1,73 +1,24 @@
 <template>
-  <v-dialog :value="value" max-width="1150px">
-    <v-card :loading="loading">
-      <v-card-title>
-        Download from Youtube as MP3
-        <v-btn @click="inputShaped = !inputShaped">
-          aa
-        </v-btn>
-      </v-card-title>
-      <v-divider />
-      <v-progress-linear
-        v-if="videoObj$ && !!videoObj$.title"
-        :value="progress"
-        color="red darken-2"
-        striped
-        height="8"
-      />
-      <v-card-text class="pt-5">
-        <v-row no-gutters class="flex-wrap">
-          <v-col cols="12">
-            <v-text-field
-              v-model="videoUrl"
-              label="Video URL"
-              messages="lorem impsum"
-              class="field-fix-prepend-inner"
-              :hide-details="true"
-              outlined
-              :rounded="!inputShaped"
-              :shaped="videoObj$ && !!videoObj$.title"
-              prepend-inner-icon="fas fa-external-link-alt"
-              append-icon="fas fa-download"
-              @click:append="download"
-            />
-          </v-col>
-          <v-col cols="12" v-if="videoObj$">
-            <v-card class="video-prev">
-              <v-img
-                class="white--text align-end"
-                height="240px"
-                :src="videoObj$.imageUrl"
-              >
-                <v-card-title class="bg-above-img-1 py-3 px-5">
-                  <div>
-                    {{ videoObj$.title }}
-                  </div>
-                  <div class="ml-auto">
-                    <v-icon color="red accent-4">
-                      fab fa-youtube
-                    </v-icon>
-                  </div>
-                </v-card-title>
-                <v-card-text class="bg-above-img-2 pt-3">
-                  {{ videoObj$.description }}
-                </v-card-text>
-              </v-img>
-            </v-card>
-          </v-col>
-        </v-row>
-      </v-card-text>
-    </v-card>
-  </v-dialog>
+    <v-text-field
+        v-model="videoUrl"
+        label="Video URL"
+        messages="lorem impsum"
+        class="field-fix-prepend-inner"
+        :hide-details="true"
+        outlined
+        :rounded="!inputShaped"
+        :shaped="videoObj$ && !!videoObj$.title"
+        prepend-inner-icon="fas fa-external-link-alt"
+        append-icon="fas fa-download"
+        @click:append="download"
+    />
 </template>
 
 <script lang="ts">
-import Vue from "vue";
-import VueRx from "vue-rx";
-import Component from "vue-class-component";
-import { Prop, Watch } from "vue-property-decorator";
-import { ipcRenderer } from "electron";
-import { IpcEventNames } from "@/main/IpcManager";
+import Vue from 'vue'
+import axios from "axios";
+// import VueRx from "vue-rx";
+import { VideoObj } from '@/components/Dialogs/DownloadDialog.vue';
 
 import {
   filter,
@@ -76,45 +27,37 @@ import {
   switchMap,
   pluck,
   tap,
-  map,
-  catchError
+  map
 } from "rxjs/operators";
 
-import axios from "axios";
-import { from, of } from "rxjs";
-
-export interface VideoObj {
-  title: string;
-  imageUrl: string;
-  description: string;
-}
-
-@Component<DownloadDialog>({
-  subscriptions() {
+export default Vue.extend({
+    data() {
+        return {
+            videoUrl: ''
+        }
+    },
+    props: {
+        inputShaped: {
+            type: Boolean,
+            default: false
+        },
+    },
+    methods: {
+        download() {
+            console.log('Never gonna give you up...');
+        }
+    },
+    subscriptions() {
     return {
       videoObj$: this.$watchAsObservable("videoUrl").pipe(
-        pluck("newValue"),
         filter(val => !!val),
         distinctUntilChanged(),
         debounceTime(500),
-        map(val => {
-          return new URL(val).toString();
-        }),
-        catchError((err, caught) => {
-          return caught;
-        }),
         tap(val => {
-          this.loading = true;
+          this.$data.loading = true;
         }),
         switchMap(val => {
-          return from(axios.get(val)).pipe(
-            catchError((err, caught) => {
-              this.loading = false;
-              return of({
-                status: -1
-              });
-            })
-          );
+          return axios.get(val.newValue);
         }),
         filter(val => val.status === 200),
         pluck("data"),
@@ -143,54 +86,15 @@ export interface VideoObj {
           return returnObj;
         }),
         tap(val => {
-          this.loading = false;
+          this.$data.loading = false;
         })
       )
     };
   }
 })
-export default class DownloadDialog extends Vue {
-  @Prop()
-  value!: boolean;
-
-  // $videoObj!: any;
-
-  loading = false;
-
-  progress = 0;
-
-  inputShaped = false;
-
-  videoUrl = "";
-
-  download() {
-    console.log("fu");
-  }
-
-  mounted() {
-    ipcRenderer.on("download-progress", (event, arg) => {
-      this.progress = arg;
-      console.log(arg);
-    });
-  }
-
-  destroyed() {
-    ipcRenderer.removeAllListeners("download-progress");
-  }
-}
 </script>
 
 <style lang="scss">
-.video-prev {
-  border-top-left-radius: 0 !important;
-  border-top-right-radius: 0 !important;
-}
-.bg-above-img-1 {
-  background-color: transparentize(#000, 0.28);
-}
-.bg-above-img-2 {
-  background-color: transparentize(#000, 0.18);
-}
 .field-fix-prepend-inner {
   &.v-input--is-label-active {
     // ROUND A
@@ -312,3 +216,4 @@ export default class DownloadDialog extends Vue {
   }
 }
 </style>
+
