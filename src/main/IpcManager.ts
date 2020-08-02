@@ -3,6 +3,7 @@ import fs from "fs";
 import path from "path";
 import { SongFileI } from "@/store/folder";
 import { buildDownloader } from "@/main/YtDownloader";
+import { downloadFfmpeg } from "@/main/DownloadFfmpeg";
 
 export enum IpcEventNames {
   dialogGetFolder = "dialogGetFolder",
@@ -12,11 +13,16 @@ export enum IpcEventNames {
 }
 
 export default class IpcManager {
-  static initListeners(
-    win: BrowserWindow,
-    appPath: string,
-    ffmpegPath: string
-  ) {
+  constructor(win: BrowserWindow, appPath: string) {
+    this.ffmpegPath = "";
+
+    this.initListeners(win, appPath);
+    this.setFfmpeg(win, appPath);
+  }
+
+  ffmpegPath: string;
+
+  initListeners(win: BrowserWindow, appPath: string) {
     ipcMain.handle(IpcEventNames.dialogGetFolder, async () => {
       const selection = await dialog.showOpenDialog({
         properties: ["openDirectory"],
@@ -31,7 +37,6 @@ export default class IpcManager {
     ipcMain.handle(
       IpcEventNames.getSongFiles,
       async (event, folderPath: string) => {
-        // console.log(`getSongFiles(${folderPath})`);
         const extensions = [".mp3", ".ogg", ".wav"];
         return fs
           .readdirSync(folderPath, { withFileTypes: true })
@@ -78,7 +83,7 @@ export default class IpcManager {
         const videoURL = new URL(videoUrl);
         const videoId = videoURL.searchParams.get("v") || "";
         if (videoUrl) {
-          const YDMp3 = buildDownloader(ffmpegPath, path);
+          const YDMp3 = buildDownloader(this.ffmpegPath, path);
           YDMp3.download(videoId);
 
           YDMp3.on("finished", function(err, data) {
@@ -98,5 +103,56 @@ export default class IpcManager {
         }
       }
     );
+  }
+
+  async checkFfmpeg(binPath: string) {
+    const ffmpegFilePath = path.join(binPath, "ffmpeg.exe");
+    try {
+      const ffmpegFile = await fs.promises.readFile(ffmpegFilePath);
+      if (ffmpegFile.length <= 250) throw new Error("File too small");
+      return true;
+    } catch (error) {
+      console.log("FFPEG.exe NOT FOUND");
+      return false;
+    }
+  }
+
+  async setFfmpeg(win: BrowserWindow, appPath: string) {
+    const ffpegFound = await this.checkFfmpeg(appPath);
+    if (!ffpegFound) {
+      const response = await dialog.showMessageBox(win, {
+        type: "warning",
+        buttons: ["Cancel", "It's in another directory", "Yes, please"],
+        title: "Ffmpeg.exe not found!",
+        message: "Download ffmpeg.exe to the same folder?",
+        detail:
+          "Ffmpeg is an utility to compile the audio from the video, requires around 80Mb of free space."
+      });
+      switch (response.response) {
+        case 0: {
+          win.close();
+          break;
+        }
+        case 1: {
+          const selection = await dialog.showOpenDialog({
+            properties: ["openFile"],
+            title: "Ffmpeg.exe",
+            filters: [{ name: "Executable", extensions: ["exe"] }]
+          });
+          if (selection.canceled || !selection.filePaths[0]) win.close();
+          this.ffmpegPath = selection.filePaths[0];
+          break;
+        }
+        case 2: {
+          this.ffmpegPath = path.join(appPath, "ffmpeg.exe");
+          win.webContents.send("ffmpeg-download-start");
+          await downloadFfmpeg(appPath);
+          win.webContents.send("ffmpeg-downloaded");
+          break;
+        }
+      }
+    } else {
+      this.ffmpegPath = path.join(appPath, "ffmpeg.exe");
+    }
   }
 }

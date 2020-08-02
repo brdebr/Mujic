@@ -3,7 +3,7 @@ module.exports = {
   pluginOptions: {
     electronBuilder: {
       nodeIntegration: true,
-      mainProcessWatch: ['src/main.js', 'src/main/'],
+      mainProcessWatch: ['src/main.ts', 'src/main/'],
       builderOptions: {
         win: {
           target: "portable"

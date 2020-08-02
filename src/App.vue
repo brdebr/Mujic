@@ -11,6 +11,36 @@
       <AudioControls :audio="$store.state.audio.audio" />
       <DownloadDialog :value="this.$store.state.download.dialog" />
     </v-main>
+    <div class="notifications">
+      <v-snackbar
+        v-model="ffmpegSnack1"
+        top
+        right
+        color="blue-grey lighten-1"
+        :timeout="5000"
+      >
+        {{ ffmpegSnack1Text }}
+        <template v-slot:action="{ attrs }">
+          <v-btn dark text v-bind="attrs" @click="ffmpegSnack1 = false">
+            Close
+          </v-btn>
+        </template>
+      </v-snackbar>
+      <v-snackbar
+        v-model="ffmpegSnack2"
+        top
+        right
+        color="green"
+        :timeout="5000"
+      >
+        {{ ffmpegSnack2Text }}
+        <template v-slot:action="{ attrs }">
+          <v-btn dark text v-bind="attrs" @click="ffmpegSnack2 = false">
+            Close
+          </v-btn>
+        </template>
+      </v-snackbar>
+    </div>
   </v-app>
 </template>
 
@@ -19,10 +49,15 @@ import TheDrawer from "@/components/Layout/TheDrawer.vue";
 import TheToolbar from "@/components/Layout/TheToolbar.vue";
 import AudioControls from "@/components/App/AudioControls.vue";
 import DownloadDialog from "@/components/Dialogs/DownloadDialog.vue";
+import { ipcRenderer } from "electron";
 
 export default {
   name: "App",
   data: () => ({
+    ffmpegSnack1: false,
+    ffmpegSnack1Text: "Downloading ffmpeg.exe",
+    ffmpegSnack2: false,
+    ffmpegSnack2Text: "Download complete"
     //
   }),
   components: {
@@ -32,7 +67,12 @@ export default {
     DownloadDialog
   },
   mounted() {
-    // this.$store.commit('app/fetchInstances');
+    ipcRenderer.on("ffmpeg-download-start", () => {
+      this.ffmpegSnack1 = true;
+    });
+    ipcRenderer.on("ffmpeg-downloaded", () => {
+      this.ffmpegSnack2 = true;
+    });
   }
 };
 </script>

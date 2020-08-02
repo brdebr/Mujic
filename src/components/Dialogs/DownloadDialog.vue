@@ -2,6 +2,7 @@
   <v-dialog
     :value="value"
     max-width="1150px"
+    :persistent="locked"
     @input="v => $store.commit('download/setDialog', v)"
   >
     <v-card :loading="loading">
