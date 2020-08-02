@@ -2,8 +2,7 @@ import { ipcMain, dialog, BrowserWindow } from "electron";
 import fs from "fs";
 import path from "path";
 import { SongFileI } from "@/store/folder";
-import { buildDownloader } from "@/main/YtDownloader";
-import { downloadFfmpeg } from "@/main/DownloadFfmpeg";
+import { buildDownloader, downloadFfmpeg } from "@/main/YtDownloader";
 
 export enum IpcEventNames {
   dialogGetFolder = "dialogGetFolder",
@@ -153,6 +152,12 @@ export default class IpcManager {
       }
     } else {
       this.ffmpegPath = path.join(appPath, "ffmpeg.exe");
+      await dialog.showMessageBox(win, {
+        type: "info",
+        buttons: ["Okay"],
+        title: "Ffmpeg loaded",
+        message: "Using ffmpeg from same folder"
+      });
     }
   }
 }

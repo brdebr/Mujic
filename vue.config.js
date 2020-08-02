@@ -6,7 +6,8 @@ module.exports = {
       mainProcessWatch: ['src/main.ts', 'src/main/'],
       builderOptions: {
         win: {
-          target: "portable"
+          target: "portable",
+          icon: "build/icon.ico"
         }
       }
     }

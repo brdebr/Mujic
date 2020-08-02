@@ -6,7 +6,7 @@ import { createProtocol } from "vue-cli-plugin-electron-builder/lib";
 import IpcManager from '@/main/IpcManager';
 import path from 'path'
 import fs from 'fs';
-import { downloadFfmpeg } from '@/main/DownloadFfmpeg';
+import { downloadFfmpeg } from '@/main/YtDownloader';
 const isDevelopment = process.env.NODE_ENV !== "production";
 
 // Keep a global reference of the window object, if you don't, the window will
