@@ -1,4 +1,4 @@
-import { ipcMain, dialog, BrowserWindow } from "electron";
+import { ipcMain, dialog, BrowserWindow, shell } from "electron";
 import fs from "fs";
 import path from "path";
 import { SongFileI } from "@/store/folder";
@@ -76,6 +76,14 @@ export default class IpcManager {
       }
     );
 
+    ipcMain.handle("open-folder", async (event, folderPath: string) => {
+      shell.openPath(folderPath);
+    });
+
+    ipcMain.handle("check-ffmpeg", event => {
+      return !!this.ffmpegPath;
+    });
+
     ipcMain.on(
       IpcEventNames.downloadYT,
       async (event, videoUrl: string, path: string) => {
@@ -140,6 +148,7 @@ export default class IpcManager {
           });
           if (selection.canceled || !selection.filePaths[0]) win.close();
           this.ffmpegPath = selection.filePaths[0];
+          win.webContents.send("ffmpeg-set");
           break;
         }
         case 2: {
@@ -158,6 +167,7 @@ export default class IpcManager {
         title: "Ffmpeg loaded",
         message: "Using ffmpeg from same folder"
       });
+      win.webContents.send("ffmpeg-set");
     }
   }
 }

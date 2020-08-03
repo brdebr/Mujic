@@ -3,9 +3,22 @@
     <v-col>
       <v-card width="100%">
         <v-card-title class="text-h5 py-3 px-4">
-          <span class="font-weight-bold">
-            Songs
-          </span>
+          <div class="d-flex align-center">
+            <v-btn
+              outlined
+              title="Open on explorer"
+              class="mr-4"
+              :disabled="!$store.state.folder.folderName"
+              @click="openFolder"
+            >
+              <v-icon>
+                fas fa-folder
+              </v-icon>
+            </v-btn>
+            <span class="font-weight-bold">
+              Songs
+            </span>
+          </div>
           <v-spacer />
           <span class="subtitle-1" v-if="$store.state.folder.folderName">
             <span class="mr-5"> [ {{ $store.state.folder.folderName }} ] </span>
@@ -119,6 +132,7 @@ import OpenFolder from "@/components/Actions/OpenFolder.vue";
 
 import moment from "moment";
 import OpenDownload from "@/components/Actions/OpenDownload.vue";
+import { ipcRenderer } from "electron";
 
 @Component({
   components: {
@@ -130,6 +144,10 @@ export default class SongsList extends Vue {
   async selectSong(song: Record<string, any>, i: number) {
     await this.$store.dispatch("folder/selectSongByIndex", i);
     this.$store.state.audio.audio.play();
+  }
+
+  openFolder() {
+    ipcRenderer.invoke("open-folder", this.$store.state.folder.folderName);
   }
 
   formatDate(ms: number) {

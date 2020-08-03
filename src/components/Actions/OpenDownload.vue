@@ -4,7 +4,9 @@
     class="mr-4"
     @click="openDownload"
     :dark="dark"
-    :disabled="!$store.state.folder.folderName"
+    :disabled="
+      !$store.state.folder.folderName || !$store.state.download.loadedFfmpeg
+    "
   >
     <v-icon class="mr-2" size="20">
       fab fa-youtube

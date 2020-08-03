@@ -67,12 +67,21 @@ export default {
     DownloadDialog
   },
   mounted() {
-    ipcRenderer.on("ffmpeg-download-start", () => {
-      this.ffmpegSnack1 = true;
-    });
-    ipcRenderer.on("ffmpeg-downloaded", () => {
-      this.ffmpegSnack2 = true;
-    });
+    const ffpegState = ipcRenderer.invoke("check-ffmpeg");
+    if (ffpegState) {
+      this.$store.commit("download/setLoadedFfmpeg", true);
+    } else {
+      ipcRenderer.on("ffmpeg-download-start", () => {
+        this.ffmpegSnack1 = true;
+      });
+      ipcRenderer.on("ffmpeg-downloaded", () => {
+        this.ffmpegSnack2 = true;
+        this.$store.commit("download/setLoadedFfmpeg", true);
+      });
+      ipcRenderer.on("ffmpeg-set", () => {
+        this.$store.commit("download/setLoadedFfmpeg", true);
+      });
+    }
   }
 };
 </script>
