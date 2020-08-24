@@ -65,7 +65,8 @@ export default class IpcManager {
               },
               name: path.basename(el.name, extension)
             } as SongFileI;
-          });
+          })
+          .sort((a, b) => a.name.localeCompare(b.name));
       }
     );
 

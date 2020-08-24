@@ -22,7 +22,7 @@ import { IpcEventNames } from "@/main/IpcManager";
 export default class OpenFolder extends Vue {
   async openFolder() {
     const folderPath = await ipcRenderer.invoke(IpcEventNames.dialogGetFolder);
-    this.$store.dispatch("folder/fetchSongFiles", folderPath);
+    if (folderPath) this.$store.dispatch("folder/fetchSongFiles", folderPath);
   }
   @Prop()
   dark!: boolean;
