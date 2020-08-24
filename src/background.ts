@@ -5,13 +5,12 @@ import installExtension, { VUEJS_DEVTOOLS } from 'electron-devtools-installer';
 import { createProtocol } from "vue-cli-plugin-electron-builder/lib";
 import IpcManager from '@/main/IpcManager';
 import path from 'path'
-import fs from 'fs';
-import { downloadFfmpeg } from '@/main/YtDownloader';
 const isDevelopment = process.env.NODE_ENV !== "production";
 
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
 let win: BrowserWindow | null;
+let appPath = process.env.PORTABLE_EXECUTABLE_DIR || __dirname // === /dist_electron
 
 // Scheme must be registered before the app is ready
 protocol.registerSchemesAsPrivileged([
@@ -19,6 +18,10 @@ protocol.registerSchemesAsPrivileged([
 ]);
 
 async function createWindow() {
+  let manager = new IpcManager(appPath);
+
+  manager.preWindowListeners()
+
   // Create the browser window.
   win = new BrowserWindow({
     title: 'Mujic',
@@ -34,6 +37,11 @@ async function createWindow() {
       nodeIntegration: true
     }
   });
+  win.webContents.on('did-finish-load', () => {
+    if(win){
+      manager.configFfmpeg(win);
+    }
+  })
 
   if(!isDevelopment) win.removeMenu();
 
@@ -55,10 +63,7 @@ async function createWindow() {
     win = null;
   });
 
-  let appPath = process.env.PORTABLE_EXECUTABLE_DIR || __dirname // === /dist_electron
-
-  let manager = new IpcManager(win, appPath);
-
+  manager.initListeners();
 }
 app.commandLine.appendSwitch('disable-web-security'); 
 

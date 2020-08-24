@@ -12,16 +12,21 @@ export enum IpcEventNames {
 }
 
 export default class IpcManager {
-  constructor(win: BrowserWindow, appPath: string) {
+  constructor(appPath: string) {
     this.ffmpegPath = "";
-
-    this.initListeners(win, appPath);
-    this.setFfmpeg(win, appPath);
+    this.appPath = appPath;
   }
 
   ffmpegPath: string;
+  appPath: string;
 
-  initListeners(win: BrowserWindow, appPath: string) {
+  preWindowListeners() {
+    ipcMain.handle("check-ffmpeg", event => {
+      return !!this.ffmpegPath;
+    });
+  }
+
+  initListeners() {
     ipcMain.handle(IpcEventNames.dialogGetFolder, async () => {
       const selection = await dialog.showOpenDialog({
         properties: ["openDirectory"],
@@ -81,10 +86,6 @@ export default class IpcManager {
       shell.openPath(folderPath);
     });
 
-    ipcMain.handle("check-ffmpeg", event => {
-      return !!this.ffmpegPath;
-    });
-
     ipcMain.on(
       IpcEventNames.downloadYT,
       async (event, videoUrl: string, path: string) => {
@@ -96,7 +97,7 @@ export default class IpcManager {
 
           YDMp3.on("finished", function(err, data) {
             event.reply("download-finished", data);
-            // console.log(JSON.stringify(data));
+            console.log(JSON.stringify(data));
           });
 
           YDMp3.on("error", function(error) {
@@ -106,7 +107,6 @@ export default class IpcManager {
 
           YDMp3.on("progress", function(info) {
             event.reply("download-progress", info.progress.percentage);
-            // console.log(JSON.stringify(info));
           });
         }
       }
@@ -125,8 +125,8 @@ export default class IpcManager {
     }
   }
 
-  async setFfmpeg(win: BrowserWindow, appPath: string) {
-    const ffpegFound = await this.checkFfmpeg(appPath);
+  async configFfmpeg(win: BrowserWindow) {
+    const ffpegFound = await this.checkFfmpeg(this.appPath);
     if (!ffpegFound) {
       const response = await dialog.showMessageBox(win, {
         type: "warning",
@@ -153,15 +153,15 @@ export default class IpcManager {
           break;
         }
         case 2: {
-          this.ffmpegPath = path.join(appPath, "ffmpeg.exe");
+          this.ffmpegPath = path.join(this.appPath, "ffmpeg.exe");
           win.webContents.send("ffmpeg-download-start");
-          await downloadFfmpeg(appPath);
+          await downloadFfmpeg(this.appPath);
           win.webContents.send("ffmpeg-downloaded");
           break;
         }
       }
     } else {
-      this.ffmpegPath = path.join(appPath, "ffmpeg.exe");
+      this.ffmpegPath = path.join(this.appPath, "ffmpeg.exe");
       await dialog.showMessageBox(win, {
         type: "info",
         buttons: ["Okay"],

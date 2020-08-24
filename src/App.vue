@@ -66,8 +66,8 @@ export default {
     AudioControls,
     DownloadDialog
   },
-  mounted() {
-    const ffpegState = ipcRenderer.invoke("check-ffmpeg");
+  async mounted() {
+    const ffpegState = await ipcRenderer.invoke("check-ffmpeg");
     if (ffpegState) {
       this.$store.commit("download/setLoadedFfmpeg", true);
     } else {
