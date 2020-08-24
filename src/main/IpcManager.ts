@@ -2,7 +2,12 @@ import { ipcMain, dialog, BrowserWindow, shell } from "electron";
 import fs from "fs";
 import path from "path";
 import { SongFileI } from "@/store/folder";
-import { buildDownloader, downloadFfmpeg } from "@/main/YtDownloader";
+import { fetchSongTag } from "@/main/SongTags";
+import {
+  buildDownloader,
+  downloadFfmpeg,
+  handleDownloadYT
+} from "@/main/YtDownloader";
 
 export enum IpcEventNames {
   dialogGetFolder = "dialogGetFolder",
@@ -86,31 +91,11 @@ export default class IpcManager {
       shell.openPath(folderPath);
     });
 
-    ipcMain.on(
-      IpcEventNames.downloadYT,
-      async (event, videoUrl: string, path: string) => {
-        const videoURL = new URL(videoUrl);
-        const videoId = videoURL.searchParams.get("v") || "";
-        if (videoUrl) {
-          const YDMp3 = buildDownloader(this.ffmpegPath, path);
-          YDMp3.download(videoId);
+    ipcMain.handle("fetch-song-tags", (event, songPath) => {
+      return fetchSongTag(songPath);
+    });
 
-          YDMp3.on("finished", function(err, data) {
-            event.reply("download-finished", data);
-            console.log(JSON.stringify(data));
-          });
-
-          YDMp3.on("error", function(error) {
-            event.reply("download-error", true);
-            console.log(error);
-          });
-
-          YDMp3.on("progress", function(info) {
-            event.reply("download-progress", info.progress.percentage);
-          });
-        }
-      }
-    );
+    handleDownloadYT(this);
   }
 
   async checkFfmpeg(binPath: string) {

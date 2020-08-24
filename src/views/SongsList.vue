@@ -82,6 +82,13 @@
                   </div>
                 </v-list-item-subtitle>
               </v-list-item-content>
+              <v-list-item-action>
+                <v-btn outlined rounded @click.stop="showSongInfo(item)">
+                  <v-icon>
+                    far fa-file-audio
+                  </v-icon>
+                </v-btn>
+              </v-list-item-action>
             </v-list-item>
             <v-divider inset :key="`${item.name}-divid`" />
           </template>
@@ -122,6 +129,7 @@
         </v-card-text>
       </v-card>
     </v-col>
+    <SongInfoDialog :value.sync="songInfoDialog" :song="selectedSong" />
   </v-row>
 </template>
 
@@ -129,6 +137,7 @@
 import Vue from "vue";
 import Component from "vue-class-component";
 import OpenFolder from "@/components/Actions/OpenFolder.vue";
+import SongInfoDialog from "@/components/Dialogs/SongInfoDialog.vue";
 
 import moment from "moment";
 import OpenDownload from "@/components/Actions/OpenDownload.vue";
@@ -137,7 +146,8 @@ import { ipcRenderer } from "electron";
 @Component({
   components: {
     OpenFolder,
-    OpenDownload
+    OpenDownload,
+    SongInfoDialog
   }
 })
 export default class SongsList extends Vue {
@@ -148,6 +158,15 @@ export default class SongsList extends Vue {
 
   openFolder() {
     ipcRenderer.invoke("open-folder", this.$store.state.folder.folderName);
+  }
+
+  songInfoDialog = false;
+
+  selectedSong = {};
+
+  showSongInfo(song: Record<string, any>) {
+    this.selectedSong = { ...song };
+    this.songInfoDialog = true;
   }
 
   formatDate(ms: number) {

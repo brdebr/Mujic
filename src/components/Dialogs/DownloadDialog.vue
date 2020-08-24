@@ -215,12 +215,14 @@ export default class DownloadDialog extends Vue {
   locked = true;
 
   download() {
+    this.progress = 1;
     ipcRenderer.send(
       IpcEventNames.downloadYT,
       this.videoUrl,
-      this.$store.state.folder.folderName
+      this.$store.state.folder.folderName,
+      // @ts-ignore
+      (this.videoObj$ as VideoObj).imageUrl
     );
-    this.progress = 1;
   }
 
   isYoutube(obj: VideoObj) {

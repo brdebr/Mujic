@@ -29,6 +29,7 @@
     "electron-icon-builder": "^1.0.2",
     "moment": "^2.27.0",
     "node-fetch": "^2.6.0",
+    "node-id3": "github:brdebr/node-id3",
     "roboto-fontface": "*",
     "rxjs": "^6.6.2",
     "vue": "^2.6.11",
