@@ -50,23 +50,29 @@
             >
               <v-list-item-avatar
                 tile
-                class="my-0 pa-0 mr-3"
+                class="my-0 pa-0 mr-0"
                 size="112"
                 height="62"
               >
                 <v-img class="black" :src="getImageFromItem(item)" />
               </v-list-item-avatar>
-              <v-list-item-content>
+              <v-list-item-content
+                style="border-left: 1px solid #E0E0E0"
+                class="ml-1 pl-3"
+              >
                 <v-list-item-title class="black--text">
                   {{ item.name }}
                 </v-list-item-title>
                 <v-list-item-subtitle>
                   <div class="d-flex align-center pt-1">
+                    <div class="pr-3">
+                      {{ item.tags.length }}
+                    </div>
+                    <div class="pr-3" v-if="item.tags.bpm">
+                      {{ item.tags.bpm || "???" }} ♪
+                    </div>
                     <div>
                       {{ item.tags.artist }}
-                    </div>
-                    <div class="px-3">
-                      ♪ 150
                     </div>
                     <div class="ml-auto">
                       <span class="mr-10">
@@ -177,7 +183,7 @@ export default class SongsList extends Vue {
   }
 
   formatDate(ms: number) {
-    return moment(ms).format("HH:mm DD/MM/yyyy");
+    return moment(ms).format("HH:mm - DD/MM/yyyy");
   }
   formatBytes(bytes: number) {
     if (bytes === 0) return "0 Bytes";

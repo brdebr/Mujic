@@ -27,6 +27,7 @@
     "core-js": "^3.8.1",
     "electron-icon-builder": "^1.0.2",
     "moment": "^2.29.1",
+    "music-metadata": "^7.5.2",
     "node-fetch": "^2.6.1",
     "node-id3": "github:brdebr/node-id3",
     "roboto-fontface": "*",

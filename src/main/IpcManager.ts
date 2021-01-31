@@ -3,17 +3,27 @@ import fs from "fs";
 import path from "path";
 import { SongFileI } from "@/store/folder";
 import { fetchSongTag, writeSongTags } from "@/main/SongTags";
+import * as mm from "music-metadata";
 import {
   buildDownloader,
   downloadFfmpeg,
   handleDownloadYT
 } from "@/main/YtDownloader";
+import moment from "moment";
 
 export enum IpcEventNames {
   dialogGetFolder = "dialogGetFolder",
   getSongFiles = "getSongFiles",
   getSongBase64 = "getSongBase64",
   downloadYT = "downloadYT"
+}
+
+function parseSecondsToHuman(seconds: number) {
+  return moment
+    .utc()
+    .startOf("day")
+    .add({ seconds: seconds })
+    .format("mm:ss");
 }
 
 export default class IpcManager {
@@ -55,7 +65,16 @@ export default class IpcManager {
           .map(async el => {
             const fullPath = path.join(folderPath, el.name);
             const extension = path.extname(el.name);
+            const audioMetadata = await mm.parseFile(fullPath, {
+              duration: true,
+              includeChapters: false,
+              skipCovers: true,
+              skipPostHeaders: true
+            });
             const audioTags = await fetchSongTag(fullPath);
+            audioTags.length = parseSecondsToHuman(
+              audioMetadata.format.duration || 0
+            );
             const {
               size,
               atimeMs,
