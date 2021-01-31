@@ -81,7 +81,7 @@ const FolderStoreModule: Module<FolderStateI, any> = {
         "selectSong",
         ctx.state.songFiles.findIndex(el => el.path === path)
       );
-      // await ctx.dispatch("audio/fetchAudio64", null, { root: true });
+      await ctx.dispatch("audio/fetchAudio64", null, { root: true });
     },
     async selectSongByDiff(ctx, diff) {
       ctx.commit("selectSong", ctx.state.selected + diff);

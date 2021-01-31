@@ -68,7 +68,7 @@
           <template #default="{ item, index }">
             <v-list-item
               :key="item.path"
-              @click="selectSong(item, index)"
+              @click="selectSong(item)"
               :ripple="{ center: true }"
               :class="
                 (index === $store.state.folder.selected
@@ -204,8 +204,8 @@ import { SongFileI } from "@/store/folder";
   }
 })
 export default class SongsList extends Vue {
-  async selectSong(song: Record<string, any>, i: number) {
-    await this.$store.dispatch("folder/selectSongByIndex", i);
+  async selectSong(song: SongFileI) {
+    await this.$store.dispatch("folder/selectSongByPath", song.path);
     this.$store.state.audio.waveshape.play();
   }
 
