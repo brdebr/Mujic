@@ -29,7 +29,7 @@
         <v-virtual-scroll
           :items="$store.state.folder.songFiles"
           bench="1"
-          :item-height="61"
+          :item-height="73"
           height="510"
           v-if="
             $store.state.folder.folderName &&
@@ -39,34 +39,34 @@
         >
           <template #default="{ item, index }">
             <v-list-item
-              :key="item.name"
+              :key="item.path"
               @click="selectSong(item, index)"
               :ripple="{ center: true }"
               :class="
-                index === $store.state.folder.selected
+                (index === $store.state.folder.selected
                   ? 'v-item--active v-list-item--active amber--text'
-                  : null
+                  : null) + ' pl-1 py-1'
               "
             >
-              <v-list-item-avatar>
-                <v-icon large>
-                  fas fa-compact-disc
-                  {{
-                    index === $store.state.folder.selected &&
-                    $store.state.audio.state === "playing"
-                      ? "fa-spin"
-                      : null
-                  }}
-                </v-icon>
+              <v-list-item-avatar
+                tile
+                class="my-0 pa-0 mr-3"
+                size="112"
+                height="62"
+              >
+                <v-img class="black" :src="getImageFromItem(item)" />
               </v-list-item-avatar>
               <v-list-item-content>
                 <v-list-item-title class="black--text">
                   {{ item.name }}
                 </v-list-item-title>
                 <v-list-item-subtitle>
-                  <div class="d-flex align-center">
+                  <div class="d-flex align-center pt-1">
                     <div>
-                      Lorem ipsum
+                      {{ item.tags.artist }}
+                    </div>
+                    <div class="px-3">
+                      ♪ 150
                     </div>
                     <div class="ml-auto">
                       <span class="mr-10">
@@ -82,15 +82,15 @@
                   </div>
                 </v-list-item-subtitle>
               </v-list-item-content>
-              <v-list-item-action>
-                <v-btn outlined rounded @click.stop="showSongInfo(item)">
+              <v-list-item-action class="pl-5">
+                <v-btn outlined @click.stop="showSongInfo(item)">
                   <v-icon>
                     far fa-file-audio
                   </v-icon>
                 </v-btn>
               </v-list-item-action>
             </v-list-item>
-            <v-divider inset :key="`${item.name}-divid`" />
+            <v-divider :key="`${item.path}-divid`" />
           </template>
         </v-virtual-scroll>
         <v-card-text
@@ -129,7 +129,7 @@
         </v-card-text>
       </v-card>
     </v-col>
-    <SongInfoDialog :value.sync="songInfoDialog" :song="selectedSong" />
+    <SongInfoDialog :dialog.sync="songInfoDialog" :song="selectedSong" />
   </v-row>
 </template>
 
@@ -142,6 +142,7 @@ import SongInfoDialog from "@/components/Dialogs/SongInfoDialog.vue";
 import moment from "moment";
 import OpenDownload from "@/components/Actions/OpenDownload.vue";
 import { ipcRenderer } from "electron";
+import { SongFileI } from "@/store/folder";
 
 @Component({
   components: {
@@ -167,6 +168,12 @@ export default class SongsList extends Vue {
   showSongInfo(song: Record<string, any>) {
     this.selectedSong = { ...song };
     this.songInfoDialog = true;
+  }
+
+  getImageFromItem(item: SongFileI) {
+    const imgByteArr = new Buffer(item.tags.image?.imageBuffer as Uint8Array);
+    return `data:image/${item.tags.image?.mime ||
+      "png"};base64,${imgByteArr.toString("base64")}`;
   }
 
   formatDate(ms: number) {

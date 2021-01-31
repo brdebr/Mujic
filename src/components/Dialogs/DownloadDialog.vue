@@ -13,6 +13,7 @@
       <v-progress-linear
         v-if="progress > 0"
         :value="progress"
+        :indeterminate="progress === 0.5"
         color="red darken-2"
         striped
         height="8"
@@ -215,7 +216,7 @@ export default class DownloadDialog extends Vue {
   locked = true;
 
   download() {
-    this.progress = 1;
+    this.progress = 0.5;
     ipcRenderer.send(
       IpcEventNames.downloadYT,
       this.videoUrl,

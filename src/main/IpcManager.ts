@@ -2,7 +2,7 @@ import { ipcMain, dialog, BrowserWindow, shell } from "electron";
 import fs from "fs";
 import path from "path";
 import { SongFileI } from "@/store/folder";
-import { fetchSongTag } from "@/main/SongTags";
+import { fetchSongTag, writeSongTags } from "@/main/SongTags";
 import {
   buildDownloader,
   downloadFfmpeg,
@@ -47,14 +47,15 @@ export default class IpcManager {
       IpcEventNames.getSongFiles,
       async (event, folderPath: string) => {
         const extensions = [".mp3", ".ogg", ".wav"];
-        return fs
+        const promises = fs
           .readdirSync(folderPath, { withFileTypes: true })
           .filter(
             el => el.isFile() && extensions.includes(path.extname(el.name))
           )
-          .map(el => {
+          .map(async el => {
             const fullPath = path.join(folderPath, el.name);
             const extension = path.extname(el.name);
+            const audioTags = await fetchSongTag(fullPath);
             const {
               size,
               atimeMs,
@@ -73,10 +74,14 @@ export default class IpcManager {
                 ctimeMs,
                 birthtimeMs
               },
+              tags: audioTags,
               name: path.basename(el.name, extension)
             } as SongFileI;
-          })
-          .sort((a, b) => a.name.localeCompare(b.name));
+          });
+
+        return (await Promise.all(promises)).sort((a, b) =>
+          a.name.localeCompare(b.name)
+        );
       }
     );
 
@@ -91,8 +96,16 @@ export default class IpcManager {
       shell.openPath(folderPath);
     });
 
+    ipcMain.handle("open-link", async (event, link: string) => {
+      shell.openExternal(link);
+    });
+
     ipcMain.handle("fetch-song-tags", (event, songPath) => {
       return fetchSongTag(songPath);
+    });
+
+    ipcMain.handle("save-song-tags", (event, tags, songPath) => {
+      return writeSongTags(tags, songPath);
     });
 
     handleDownloadYT(this);

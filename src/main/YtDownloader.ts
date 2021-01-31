@@ -69,7 +69,6 @@ export function handleDownloadYT(ipcManager: IpcManager) {
             filePath
           );
           event.reply("download-finished", data);
-          // console.log(JSON.stringify(data));
         });
 
         YDMp3.on("error", function(error) {

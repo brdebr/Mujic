@@ -1,6 +1,7 @@
 import { Module } from "vuex";
 import { ipcRenderer } from "electron";
 import { IpcEventNames } from "@/main/IpcManager";
+import { AudioTag } from "@/main/SongTags";
 
 export interface FolderStateI {
   folderName: string;
@@ -13,6 +14,14 @@ export interface SongFileI {
   path: string;
   extension?: string;
   name: string;
+  meta: {
+    size: number;
+    atimeMs: number;
+    mtimeMs: number;
+    ctimeMs: number;
+    birthtimeMs: number;
+  };
+  tags: AudioTag;
 }
 
 const FolderStoreModule: Module<FolderStateI, any> = {
@@ -53,8 +62,15 @@ const FolderStoreModule: Module<FolderStateI, any> = {
       ctx.commit("selectSong", index);
       await ctx.dispatch("audio/fetchAudio64", null, { root: true });
     },
+    async selectSongByPath(ctx, path) {
+      ctx.commit(
+        "selectSong",
+        ctx.state.songFiles.findIndex(el => el.path === path)
+      );
+      // await ctx.dispatch("audio/fetchAudio64", null, { root: true });
+    },
     async selectSongByDiff(ctx, diff) {
-      ctx.commit("selectSong", ctx.state.selected - diff);
+      ctx.commit("selectSong", ctx.state.selected + diff);
       await ctx.dispatch("audio/fetchAudio64", null, { root: true });
     },
     async fetchSongFiles(ctx, folderPath) {
@@ -65,10 +81,15 @@ const FolderStoreModule: Module<FolderStateI, any> = {
         folderPath
       );
       if (songFiles.length) {
+        const selectedPath = ctx.getters["selectedSong"]?.path;
         ctx.commit("setSongFiles", songFiles);
+        if (selectedPath) {
+          await ctx.dispatch("selectSongByPath", selectedPath);
+          ctx.commit("setLoading", false);
+          return;
+        }
         await ctx.dispatch("selectSongByIndex", 0);
       }
-
       ctx.commit("setLoading", false);
     }
   }
