@@ -150,8 +150,6 @@ import { Prop, Watch } from "vue-property-decorator";
 import { ipcRenderer } from "electron";
 import { SongFileI } from "@/store/folder";
 import { AudioTag } from "@/main/SongTags";
-// import { ipcRenderer } from "electron";
-// import { IpcEventNames } from "@/main/IpcManager";
 
 @Component({})
 export default class SongInfoDialog extends Vue {
@@ -179,8 +177,6 @@ export default class SongInfoDialog extends Vue {
     const link = this.info.userDefinedUrl?.find(
       el => (el.description = "Youtube URL")
     )?.url;
-    console.log({ link });
-
     if (!link) {
       return;
     }
@@ -191,8 +187,6 @@ export default class SongInfoDialog extends Vue {
     const link = this.info.userDefinedUrl?.find(
       el => (el.description = "Youtube URL")
     )?.url;
-    console.log({ link });
-
     if (!link) {
       return;
     }

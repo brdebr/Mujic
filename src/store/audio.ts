@@ -58,7 +58,6 @@ const AudioStoreModule: Module<AudioStateI, any> = {
   actions: {
     async fetchAudio64(ctx) {
       const song: SongFileI = ctx.rootGetters["folder/selectedSong"];
-      // console.log({ song });
       ctx.commit(
         "setBase64",
         await ipcRenderer.invoke(IpcEventNames.getSongBase64, song.path)

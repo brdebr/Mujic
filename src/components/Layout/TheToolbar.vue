@@ -18,9 +18,6 @@
           color="blue-grey darken-4"
           :ripple="{ center: true, class: 'lime--text text--lighten-3' }"
         >
-          <!-- <v-icon color="white" class="mr-4 ml-n1">
-            fas fa-music
-          </v-icon> -->
           <img src="@/assets/img/logo.png" class="logo-img" />
         </v-btn>
       </router-link>

@@ -31,25 +31,6 @@
             fas fa-folder
           </v-icon>
         </v-list-item>
-        <!-- <v-list-item
-          v-for="(instance, index) in $store.state.app.sakaiInstances"
-          :key="instance.id"
-          :title="instance.name"
-          :input-value="index === $store.state.app.selectedInstanceIndex"
-          router
-          active-class="blue--text text--darken-3"
-          exact
-          @click="$store.commit('app/setSelectedInstanceIndex', index)"
-        >
-          <v-list-item-icon class="ml-3 mr-auto">
-            <v-icon>{{ instance.icon || "fas fa-hdd" }}</v-icon>
-          </v-list-item-icon>
-          <v-list-item-content class="ml-4">
-            <v-list-item-title>
-              {{ instance.name }}
-            </v-list-item-title>
-          </v-list-item-content>
-        </v-list-item> -->
       </v-list>
       <v-spacer />
       <transition name="flip-x" mode="out-in">

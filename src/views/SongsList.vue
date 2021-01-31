@@ -246,11 +246,4 @@ export default class SongsList extends Vue {
     margin: auto !important;
   }
 }
-// .virt-song-list {
-//   .v-virtual-scroll__item:last-of-type {
-//     .v-divider {
-//       display: none;
-//     }
-//   }
-// }
 </style>

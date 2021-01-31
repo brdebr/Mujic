@@ -29,7 +29,6 @@ import { Prop } from "vue-property-decorator";
 export default class OpenDownload extends Vue {
   async openDownload() {
     this.$store.commit("download/setDialog", true);
-    // this.$store.state.download.dialog
   }
   @Prop()
   dark!: boolean;

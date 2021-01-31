@@ -1,12 +1,5 @@
 <template>
   <v-card tile style="position: fixed; bottom: 0; width: calc(100% - 80px);">
-    <!-- <v-progress-linear
-      color="indigo darken-4"
-      :value="progress"
-      striped
-      class="my-0"
-      height="10"
-    /> -->
     <div
       v-show="selectedSong"
       id="waveshape-container"
@@ -57,7 +50,6 @@
             <v-icon small>far fa-list-alt</v-icon>
           </v-btn>
         </v-list-item-icon>
-        <!-- <<  |>  >> -->
         <v-list-item-icon>
           <BpmFinderDialog />
         </v-list-item-icon>
