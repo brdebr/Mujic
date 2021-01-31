@@ -44,7 +44,7 @@
         </v-list-item-icon>
         <!-- <<  |>  >> -->
         <v-list-item-icon>
-          <v-btn outlined icon @click="playNext">
+          <v-btn outlined icon @click="playBefore">
             <v-icon small>fas fa-fast-backward</v-icon>
           </v-btn>
         </v-list-item-icon>
@@ -56,7 +56,7 @@
           </v-btn>
         </v-list-item-icon>
         <v-list-item-icon class="ml-0">
-          <v-btn outlined icon @click="playBefore">
+          <v-btn outlined icon @click="playNext">
             <v-icon small>fas fa-fast-forward</v-icon>
           </v-btn>
         </v-list-item-icon>
