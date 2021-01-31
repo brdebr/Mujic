@@ -42,6 +42,7 @@ const AudioStoreModule: Module<AudioStateI, any> = {
         cursorWidth: 2,
         barMinHeight: 0.5
       });
+      state.waveshape.setVolume(0.5);
     },
     loadWave(state) {
       if (!state.audioEl) {

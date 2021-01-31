@@ -1,6 +1,33 @@
 <template>
-  <v-row no-gutters style="padding-bottom: 100px;">
-    <v-col>
+  <v-row no-gutters style="padding-bottom: 100px;" class="flex-wrap">
+    <v-col
+      cols="12"
+      class="mb-3"
+      v-if="$store.state.folder.folderName && !$store.state.folder.loading"
+    >
+      <v-card>
+        <v-card-text class="pa-2">
+          <v-text-field
+            placeholder="Search..."
+            dense
+            v-model="search"
+            @input="v => $store.commit('folder/setSearch', v)"
+            clearable
+            outlined
+            color="orange darken-1"
+            hide-details
+            class="search-box"
+          >
+            <template #append>
+              <v-icon size="20">
+                $search
+              </v-icon>
+            </template>
+          </v-text-field>
+        </v-card-text>
+      </v-card>
+    </v-col>
+    <v-col cols="12">
       <v-card width="100%">
         <v-card-title class="text-h5 py-3 px-4">
           <div class="d-flex align-center">
@@ -27,7 +54,7 @@
         </v-card-title>
         <v-divider />
         <v-virtual-scroll
-          :items="$store.state.folder.songFiles"
+          :items="$store.getters['folder/filteredList']"
           bench="1"
           :item-height="73"
           height="480"
@@ -66,7 +93,14 @@
                 <v-list-item-subtitle>
                   <div class="d-flex align-center pt-1">
                     <div class="pr-3">
-                      {{ item.tags.length }}
+                      <span>
+                        {{ item.tags.length }}
+                      </span>
+                      <span>
+                        <v-icon size="12">
+                          far fa-clock
+                        </v-icon>
+                      </span>
                     </div>
                     <div class="pr-3" v-if="item.tags.bpm">
                       {{ item.tags.bpm || "???" }} ♪
@@ -164,11 +198,13 @@ export default class SongsList extends Vue {
     ipcRenderer.invoke("open-folder", this.$store.state.folder.folderName);
   }
 
+  search = "";
+
   songInfoDialog = false;
 
   selectedSong = {};
 
-  showSongInfo(song: Record<string, any>) {
+  showSongInfo(song: any) {
     this.selectedSong = { ...song };
     this.songInfoDialog = true;
   }
@@ -195,3 +231,10 @@ export default class SongsList extends Vue {
   }
 }
 </script>
+<style lang="scss">
+.search-box {
+  .v-input__append-inner {
+    margin: auto !important;
+  }
+}
+</style>

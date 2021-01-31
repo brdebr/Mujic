@@ -13,7 +13,7 @@ export function buildDownloader(ffmpegPath: string, outputPath: string) {
     outputPath,
     youtubeVideoQuality: "highestaudio",
     queueParallelism: 1,
-    progressTimeout: 1000
+    progressTimeout: 2000
   });
 }
 

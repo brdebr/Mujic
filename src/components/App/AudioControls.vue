@@ -29,10 +29,23 @@
             {{ selectedSong.name }}
           </v-list-item-title>
           <v-list-item-subtitle>
-            Lorem ipsum dolor
+            {{ selectedSong.tags.artist }}
           </v-list-item-subtitle>
         </v-list-item-content>
         <v-spacer />
+        <div style="width:250px" class="px-5">
+          <v-slider
+            min="0"
+            max="100"
+            hide-details
+            value="50"
+            track-color="#EF6C00"
+            thumb-label
+            @change="changeVolume"
+            color="#EF6C00"
+            prepend-icon="fas fa-volume-up"
+          />
+        </div>
         <v-list-item-icon class="mr-10">
           <v-btn
             outlined
@@ -75,6 +88,7 @@ import { mapGetters } from "vuex";
 import { Prop, Watch } from "vue-property-decorator";
 
 import moment from "moment";
+import { SongFileI } from "@/store/folder";
 function parseSecondsToHuman(seconds: number) {
   return moment
     .utc()
@@ -91,7 +105,7 @@ function parseSecondsToHuman(seconds: number) {
   }
 })
 export default class AudioControls extends Vue {
-  selectedSong: any;
+  selectedSong!: SongFileI;
 
   playingNext = true;
 
@@ -112,6 +126,7 @@ export default class AudioControls extends Vue {
   audioState: "playing" | "paused" | "stoped" = "stoped";
   progress = 0;
   duration = 0;
+  volume = 50;
   currentTimeVal = "00:00";
   totalTimeVal = "00:00";
 
@@ -132,7 +147,13 @@ export default class AudioControls extends Vue {
         this.$store.commit("audio/setAudioState", this.audioState);
       });
       this.waveshape.on("ready", this.refreshDuration);
+      this.volume = this.waveshape.getVolume();
     });
+  }
+
+  changeVolume(val: number) {
+    this.volume = val;
+    this.waveshape.setVolume(this.volume / 100);
   }
 
   destroyed() {

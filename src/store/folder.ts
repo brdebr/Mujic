@@ -8,6 +8,7 @@ export interface FolderStateI {
   selected: number;
   songFiles: Array<SongFileI>;
   loading: boolean;
+  search: string;
 }
 
 export interface SongFileI {
@@ -31,11 +32,15 @@ const FolderStoreModule: Module<FolderStateI, any> = {
     folderName: "",
     selected: 0,
     songFiles: [],
-    loading: false
+    loading: false,
+    search: ""
   },
   mutations: {
     setFolderName: (state, payload) => {
       state.folderName = payload;
+    },
+    setSearch: (state, payload) => {
+      state.search = payload;
     },
     setLoading: (state, payload) => {
       state.loading = payload;
@@ -56,6 +61,14 @@ const FolderStoreModule: Module<FolderStateI, any> = {
   getters: {
     selectedSong(state) {
       return state.songFiles[state.selected];
+    },
+    filteredList(state) {
+      if (!state.search) {
+        return state.songFiles;
+      }
+      return state.songFiles.filter(el =>
+        el.name.toLowerCase().includes(state.search.toLowerCase())
+      );
     }
   },
   actions: {
@@ -83,7 +96,7 @@ const FolderStoreModule: Module<FolderStateI, any> = {
       );
       songFiles = songFiles.map(el => {
         const metaImageSrc = `data:image/${el.tags.image?.mime ||
-          "png"};base64,${new Buffer(
+          "png"};base64,${Buffer.from(
           el.tags.image?.imageBuffer as Uint8Array
         ).toString("base64")}`;
         el.meta.imageSrc = metaImageSrc;

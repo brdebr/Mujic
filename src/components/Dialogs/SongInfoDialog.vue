@@ -11,7 +11,7 @@
         </div>
         <v-spacer />
         <div>
-          <v-btn outlined color="info" title="Edit song information">
+          <v-btn outlined color="orange darken-3" title="Edit song information">
             <v-icon size="18">
               $edit
             </v-icon>
@@ -36,7 +36,11 @@
         :contain="containImage"
       >
         <v-card-title class="white--text">
-          {{ song.name }}
+          <div>
+            {{ song.name }}
+          </div>
+          <v-spacer />
+          <div>[ {{ info.length }} ]</div>
         </v-card-title>
       </v-img>
       <v-divider />
@@ -66,20 +70,9 @@ import Component from "vue-class-component";
 import { Prop, Watch } from "vue-property-decorator";
 import { ipcRenderer } from "electron";
 import { SongFileI } from "@/store/folder";
+import { AudioTag } from "@/main/SongTags";
 // import { ipcRenderer } from "electron";
 // import { IpcEventNames } from "@/main/IpcManager";
-
-interface SongTags {
-  artist?: string;
-  image?: object;
-  title?: string;
-  userDefinedUrl?: [
-    {
-      description: string;
-      url: string;
-    }
-  ];
-}
 
 @Component({})
 export default class SongInfoDialog extends Vue {
@@ -119,7 +112,7 @@ export default class SongInfoDialog extends Vue {
 
   imageBase64: string | null = null;
 
-  info: SongTags = {};
+  info: AudioTag = {};
 
   @Watch("dialog")
   async fetchSongInfo(newVal: boolean, oldVal: boolean) {
@@ -128,8 +121,8 @@ export default class SongInfoDialog extends Vue {
       this.containImage = false;
       return;
     }
-    const info = await ipcRenderer.invoke("fetch-song-tags", this.song.path);
-    console.log({ songInfo: info });
+    const info = this.song.tags;
+    // console.log({ songInfo: info });
 
     this.info = { ...info };
 
