@@ -30,7 +30,7 @@
           :items="$store.state.folder.songFiles"
           bench="1"
           :item-height="73"
-          height="510"
+          height="480"
           v-if="
             $store.state.folder.folderName &&
               !$store.state.folder.loading &&
@@ -77,9 +77,6 @@
                     <div class="ml-auto">
                       <span class="mr-10">
                         {{ formatBytes(item.meta.size) }}
-                      </span>
-                      <span class="mr-4">
-                        {{ formatDate(item.meta.atimeMs) }}
                       </span>
                       <span>
                         {{ formatDate(item.meta.mtimeMs) }}
@@ -160,7 +157,7 @@ import { SongFileI } from "@/store/folder";
 export default class SongsList extends Vue {
   async selectSong(song: Record<string, any>, i: number) {
     await this.$store.dispatch("folder/selectSongByIndex", i);
-    this.$store.state.audio.audio.play();
+    this.$store.state.audio.waveshape.play();
   }
 
   openFolder() {

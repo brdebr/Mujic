@@ -133,12 +133,7 @@ export default class SongInfoDialog extends Vue {
 
     this.info = { ...info };
 
-    const imgByteArr = new Buffer(info.image?.imageBuffer as Uint8Array);
-    if (!imgByteArr.length) {
-      return;
-    }
-    this.imageBase64 = `data:image/${info.image?.mime ||
-      "png"};base64,${imgByteArr.toString("base64")}`;
+    this.imageBase64 = this.song.meta.imageSrc;
   }
 }
 </script>

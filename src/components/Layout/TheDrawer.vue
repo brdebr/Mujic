@@ -4,6 +4,7 @@
     mini-variant-width="80"
     :value="$store.state.layout.drawer"
     clipped
+    stateless
     :mobile-breakpoint="950"
     class="drawer-border"
     fixed

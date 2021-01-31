@@ -20,6 +20,7 @@ export interface SongFileI {
     mtimeMs: number;
     ctimeMs: number;
     birthtimeMs: number;
+    imageSrc: string;
   };
   tags: AudioTag;
 }
@@ -76,10 +77,18 @@ const FolderStoreModule: Module<FolderStateI, any> = {
     async fetchSongFiles(ctx, folderPath) {
       ctx.commit("setFolderName", folderPath);
       ctx.commit("setLoading", true);
-      const songFiles: SongFileI[] = await ipcRenderer.invoke(
+      let songFiles: SongFileI[] = await ipcRenderer.invoke(
         IpcEventNames.getSongFiles,
         folderPath
       );
+      songFiles = songFiles.map(el => {
+        const metaImageSrc = `data:image/${el.tags.image?.mime ||
+          "png"};base64,${new Buffer(
+          el.tags.image?.imageBuffer as Uint8Array
+        ).toString("base64")}`;
+        el.meta.imageSrc = metaImageSrc;
+        return el;
+      });
       if (songFiles.length) {
         const selectedPath = ctx.getters["selectedSong"]?.path;
         ctx.commit("setSongFiles", songFiles);

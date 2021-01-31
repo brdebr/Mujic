@@ -8,7 +8,7 @@
           <router-view :key="$route.fullPath" />
         </transition>
       </v-container>
-      <AudioControls :audio="$store.state.audio.audio" />
+      <AudioControls :waveshape="$store.state.audio.waveshape" />
       <DownloadDialog :value="this.$store.state.download.dialog" />
     </v-main>
     <div class="notifications">

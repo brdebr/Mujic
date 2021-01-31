@@ -1,17 +1,20 @@
 <template>
-  <v-card
-    tile
-    style="position: fixed; bottom: 0; width: calc(100% - 80px);"
-    v-if="selectedSong"
-  >
-    <v-progress-linear
+  <v-card tile style="position: fixed; bottom: 0; width: calc(100% - 80px);">
+    <!-- <v-progress-linear
       color="indigo darken-4"
       :value="progress"
       striped
       class="my-0"
       height="10"
-    />
-    <v-list>
+    /> -->
+    <div
+      v-show="selectedSong"
+      id="waveshape-container"
+      class="waveshape-container"
+    >
+      <div id="wave-shape" />
+    </div>
+    <v-list v-if="selectedSong">
       <v-list-item>
         <div class="px-3 mr-3">
           <div>
@@ -95,14 +98,14 @@ export default class AudioControls extends Vue {
   async playBefore() {
     await this.$store.dispatch("folder/selectSongByDiff", -1);
     this.$nextTick(() => {
-      this.audio.play();
+      this.waveshape.play();
     });
   }
 
   async playNext() {
     await this.$store.dispatch("folder/selectSongByDiff", 1);
     this.$nextTick(() => {
-      this.audio.play();
+      this.waveshape.play();
     });
   }
 
@@ -113,28 +116,45 @@ export default class AudioControls extends Vue {
   totalTimeVal = "00:00";
 
   @Prop()
-  audio: any;
+  waveshape!: WaveSurfer;
+
+  mounted() {
+    this.$store.commit("audio/initWaveShape");
+    this.$nextTick(() => {
+      this.waveshape.on("audioprocess", this.refreshProgress);
+      this.waveshape.on("finish", this.handleEnded);
+      this.waveshape.on("play", () => {
+        this.audioState = "playing";
+        this.$store.commit("audio/setAudioState", this.audioState);
+      });
+      this.waveshape.on("pause", () => {
+        this.audioState = "paused";
+        this.$store.commit("audio/setAudioState", this.audioState);
+      });
+      this.waveshape.on("ready", this.refreshDuration);
+    });
+  }
+
+  destroyed() {
+    this.waveshape?.unAll();
+    this.waveshape?.destroy();
+  }
 
   handlePlay() {
-    if (this.audioState === "playing") {
-      this.audio.pause();
+    if (this.waveshape.isPlaying()) {
+      this.waveshape.pause();
     } else {
-      this.audio.play();
+      this.waveshape.play();
     }
   }
 
   refreshProgress() {
-    // console.log("refreshProgress");
-    // console.log({ audio: this.audio.currentTime });
-    const currentTime = this.audio.currentTime;
-    const aux = (currentTime.toFixed(2) * 100) / this.duration;
-    this.progress = isNaN(aux) ? 0 : aux;
-
+    const currentTime = this.waveshape.getCurrentTime();
     this.currentTimeVal = parseSecondsToHuman(currentTime);
   }
 
   refreshDuration() {
-    this.duration = this.audio.duration;
+    this.duration = this.waveshape.getDuration();
     this.totalTimeVal = parseSecondsToHuman(this.duration);
   }
 
@@ -144,48 +164,43 @@ export default class AudioControls extends Vue {
     }
   }
 
-  refreshAudioInfo() {
-    // console.log("refreshAudioInfo");
-    // console.log({ audio: this.audio });
+  // refreshAudioInfo() {
+  //   this.audioState = this.waveshape.isPlaying() ? "playing" : "paused";
+  //   this.$store.commit("audio/setAudioState", this.audioState);
+  // }
 
-    if (this.audio.paused) {
-      this.audioState = "paused";
-    }
-    if (this.audio.ended) {
-      this.audioState = "stoped";
-    }
-    if (!this.audio.paused && !this.audio.ended) {
-      this.audioState = "playing";
-    }
-    this.$store.commit("audio/setAudioState", this.audioState);
-  }
+  // @Watch("audio")
+  // audioListeners(newVal: HTMLAudioElement, oldVal: HTMLAudioElement) {
+  //   // console.log({ oldVal });
+  //   const eventsAudioState = ["play", "pause", "ended"];
 
-  @Watch("audio")
-  audioListeners(newVal: HTMLAudioElement, oldVal: HTMLAudioElement) {
-    // console.log({ oldVal });
-    const eventsAudioState = ["play", "pause", "ended"];
-
-    if (oldVal) {
-      oldVal.pause();
-      oldVal.removeEventListener("loadedmetadata", this.refreshDuration);
-      oldVal.removeEventListener("timeupdate", this.refreshProgress);
-      oldVal.removeEventListener("ended", this.handleEnded);
-      eventsAudioState.forEach(ev => {
-        oldVal.removeEventListener(ev, this.refreshAudioInfo);
-      });
-    }
-    if (newVal) {
-      newVal.addEventListener("loadedmetadata", this.refreshDuration);
-      newVal.addEventListener("timeupdate", this.refreshProgress);
-      newVal.addEventListener("ended", this.handleEnded);
-      eventsAudioState.forEach(ev => {
-        newVal.addEventListener(ev, this.refreshAudioInfo);
-      });
-    }
-    this.refreshProgress();
-    this.refreshAudioInfo();
-  }
+  //   if (oldVal) {
+  //     oldVal.pause();
+  //     oldVal.removeEventListener("loadedmetadata", this.refreshDuration);
+  //     oldVal.removeEventListener("timeupdate", this.refreshProgress);
+  //     oldVal.removeEventListener("ended", this.handleEnded);
+  //     eventsAudioState.forEach(ev => {
+  //       oldVal.removeEventListener(ev, this.refreshAudioInfo);
+  //     });
+  //   }
+  //   if (newVal) {
+  //     newVal.addEventListener("loadedmetadata", this.refreshDuration);
+  //     newVal.addEventListener("timeupdate", this.refreshProgress);
+  //     newVal.addEventListener("ended", this.handleEnded);
+  //     eventsAudioState.forEach(ev => {
+  //       newVal.addEventListener(ev, this.refreshAudioInfo);
+  //     });
+  //   }
+  //   this.refreshProgress();
+  //   this.refreshAudioInfo();
+  // }
 }
 </script>
 
-<style></style>
+<style lang="scss">
+.waveshape-container {
+  border-bottom: 1px solid silver;
+  border-top: 1px solid silver;
+  background-color: rgba(235, 189, 51, 0.1);
+}
+</style>
