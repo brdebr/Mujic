@@ -18,7 +18,7 @@ export function buildDownloader(ffmpegPath: string, outputPath: string) {
 }
 
 const ffmpegUrl =
-  "https://ffmpeg.zeranoe.com/builds/win64/static/ffmpeg-20200730-134a48a-win64-static.zip";
+  "https://github.com/BtbN/FFmpeg-Builds/releases/download/autobuild-2020-12-29-12-39/ffmpeg-N-100493-gc720286ee3-win64-gpl-vulkan.zip";
 
 export async function downloadFfmpeg(path: string) {
   const response = await fetch(ffmpegUrl);
