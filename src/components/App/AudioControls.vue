@@ -39,7 +39,7 @@
             max="100"
             hide-details
             value="50"
-            track-color="#EF6C00"
+            track-color="yellow darken-1"
             thumb-label
             @change="changeVolume"
             color="#EF6C00"
@@ -59,6 +59,9 @@
           </v-btn>
         </v-list-item-icon>
         <!-- <<  |>  >> -->
+        <v-list-item-icon>
+          <BpmFinderDialog />
+        </v-list-item-icon>
         <v-list-item-icon>
           <v-btn outlined icon @click="playBefore">
             <v-icon small>fas fa-fast-backward</v-icon>
@@ -86,6 +89,7 @@ import Vue from "vue";
 import Component from "vue-class-component";
 import { mapGetters } from "vuex";
 import { Prop, Watch } from "vue-property-decorator";
+import BpmFinderDialog from "@/components/Dialogs/BpmFinderDialog.vue";
 
 import moment from "moment";
 import { SongFileI } from "@/store/folder";
@@ -102,6 +106,9 @@ function parseSecondsToHuman(seconds: number) {
     ...mapGetters("folder", {
       selectedSong: "selectedSong"
     })
+  },
+  components: {
+    BpmFinderDialog
   }
 })
 export default class AudioControls extends Vue {
