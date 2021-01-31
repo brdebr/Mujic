@@ -19,6 +19,10 @@ export interface AudioTag {
   artist?: string;
   size?: string;
   year?: string;
+  comment?: {
+    language: string;
+    text: string;
+  };
   userDefinedText?: [
     {
       description: string;
