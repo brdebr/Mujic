@@ -3,6 +3,11 @@ import Vuetify from "vuetify/lib";
 
 Vue.use(Vuetify);
 
+const MY_ICONS = {
+  image: "far fa-image",
+  folder: "fas fa-folder"
+};
+
 export default new Vuetify({
   theme: {
     options: {
@@ -21,6 +26,7 @@ export default new Vuetify({
     }
   },
   icons: {
-    iconfont: "fa"
+    iconfont: "fa",
+    values: MY_ICONS
   }
 });
