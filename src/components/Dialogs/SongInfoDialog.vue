@@ -56,7 +56,12 @@
           </div>
           <v-spacer />
           <div>
-            <v-btn depressed outlined @click="openExternalLink">
+            <v-btn
+              depressed
+              outlined
+              @click="openExternalLink"
+              @contextmenu="copyExternalLink"
+            >
               <span style="padding-top: 3px">
                 Visit webpage
               </span>
@@ -180,6 +185,18 @@ export default class SongInfoDialog extends Vue {
       return;
     }
     ipcRenderer.invoke("open-link", link);
+  }
+
+  async copyExternalLink() {
+    const link = this.info.userDefinedUrl?.find(
+      el => (el.description = "Youtube URL")
+    )?.url;
+    console.log({ link });
+
+    if (!link) {
+      return;
+    }
+    await navigator.clipboard.writeText(link);
   }
 
   loading = false;
