@@ -1,5 +1,11 @@
 <template>
-  <v-app-bar clipped-left app flat color="orange accent-4" class="the-toolbar">
+  <v-app-bar
+    clipped-left
+    app
+    flat
+    :color="isDev() ? 'yellow' : 'orange accent-4'"
+    class="the-toolbar"
+  >
     <v-btn
       outlined
       fab
@@ -40,7 +46,11 @@ import OpenDownload from "@/components/Actions/OpenDownload.vue";
     OpenDownload
   }
 })
-export default class extends Vue {}
+export default class extends Vue {
+  isDev() {
+    return window.process.env.NODE_ENV === "development";
+  }
+}
 </script>
 <style lang="scss">
 .logo-link {

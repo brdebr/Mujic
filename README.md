@@ -17,7 +17,7 @@ npm run electron:generate-icons
 
 ### 📦 · Compiles and minifies for production
 ```
-npm run electron:serve
+npm run electron:build
 ```
 
 ### ✅ · Run your unit tests

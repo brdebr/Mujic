@@ -108,8 +108,17 @@
             <v-col cols="12">
               <v-text-field
                 outlined
-                label="Title"
-                v-model="info.title"
+                label="Artist"
+                v-model="info.artist"
+                hide-details="auto"
+              />
+            </v-col>
+            <v-col cols="12">
+              <v-combobox
+                outlined
+                :items="$store.getters['folder/genreList']"
+                label="Genre"
+                v-model="info.genre"
                 hide-details="auto"
               />
             </v-col>
@@ -118,7 +127,7 @@
         <v-divider />
         <v-card-actions class="" style="white-space: pre-wrap;">
           <div>
-            {{ info.artist }}
+            {{ song.name }}
           </div>
           <v-spacer />
           <div>
@@ -127,7 +136,7 @@
               color="green darken-2"
               outlined
               dark
-              @click="openExternalLink"
+              @click="saveSongTags"
             >
               <span style="padding-top: 3px">
                 Save tags info
@@ -158,6 +167,7 @@ export default class SongInfoDialog extends Vue {
 
   showingImage = false;
   containImage = false;
+  editing = false;
 
   @Watch("showingImage")
   delayedContain(newVal: boolean) {
@@ -193,25 +203,43 @@ export default class SongInfoDialog extends Vue {
     await navigator.clipboard.writeText(link);
   }
 
+  async saveSongTags() {
+    await ipcRenderer.invoke("update-song-tags", this.info, this.song.path);
+    this.dialog = false;
+    this.$store.dispatch(
+      "folder/fetchSongFiles",
+      this.$store.state.folder.folderName
+    );
+  }
+
   loading = false;
 
   imageBase64: string | null = null;
 
   info: AudioTag = {};
 
+  resetState() {
+    this.showingImage = false;
+    this.containImage = false;
+    this.editing = false;
+  }
+
   @Watch("dialog")
   async fetchSongInfo(newVal: boolean, oldVal: boolean) {
     if (!newVal) {
-      this.showingImage = false;
-      this.containImage = false;
+      this.resetState();
       return;
     }
-    const info = this.song.tags;
-    this.info = { ...info };
+    const { image, raw, ...info } = this.song.tags;
+    if (info.comment === undefined) {
+      info.comment = {
+        language: "spa",
+        text: ""
+      };
+    }
+    this.info = info;
     this.imageBase64 = this.song.meta.imageSrc;
   }
-
-  editing = false;
 }
 </script>
 

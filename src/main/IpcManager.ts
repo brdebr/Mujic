@@ -2,7 +2,7 @@ import { ipcMain, dialog, BrowserWindow, shell } from "electron";
 import fs from "fs";
 import path from "path";
 import { SongFileI } from "@/store/folder";
-import { fetchSongTag, writeSongTags } from "@/main/SongTags";
+import { fetchSongTag, updateSongTags, writeSongTags } from "@/main/SongTags";
 import * as mm from "music-metadata";
 import {
   buildDownloader,
@@ -125,6 +125,10 @@ export default class IpcManager {
 
     ipcMain.handle("save-song-tags", (event, tags, songPath) => {
       return writeSongTags(tags, songPath);
+    });
+
+    ipcMain.handle("update-song-tags", (event, tags, songPath) => {
+      return updateSongTags(tags, songPath);
     });
 
     handleDownloadYT(this);

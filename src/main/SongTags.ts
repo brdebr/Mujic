@@ -54,3 +54,7 @@ export async function fetchSongTag(path: string): Promise<AudioTag> {
 export function writeSongTags(tags: Record<string, any>, filePath: string) {
   NodeID3.write(tags, filePath);
 }
+
+export function updateSongTags(tags: Record<string, any>, filePath: string) {
+  NodeID3.update(tags, filePath);
+}

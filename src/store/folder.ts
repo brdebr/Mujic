@@ -62,6 +62,11 @@ const FolderStoreModule: Module<FolderStateI, any> = {
     selectedSong(state) {
       return state.songFiles[state.selected];
     },
+    genreList(state) {
+      return [
+        ...new Set(state.songFiles.map(el => el.tags.genre).filter(el => el))
+      ];
+    },
     filteredList(state) {
       if (!state.search) {
         return state.songFiles;
