@@ -33,6 +33,7 @@
               :shaped="!locked"
               prepend-inner-icon="fas fa-external-link-alt"
               :disabled="progress > 0"
+              @contextmenu="pasteUrl"
             >
               <template #append>
                 <v-btn v-if="locked" disabled outlined icon>
@@ -228,6 +229,10 @@ export default class DownloadDialog extends Vue {
 
   isYoutube(obj: VideoObj) {
     return obj?.siteName === "YouTube";
+  }
+
+  async pasteUrl() {
+    this.videoUrl = await navigator.clipboard.readText();
   }
 
   mounted() {

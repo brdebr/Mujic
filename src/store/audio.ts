@@ -65,8 +65,7 @@ const AudioStoreModule: Module<AudioStateI, any> = {
       );
       ctx.commit("initAudioEl");
       ctx.commit("loadWave");
-      // @ts-ignore
-      navigator.mediaSession.metadata = new MediaMetadata({
+      const metadataOpts = {
         title: song.tags.title,
         artist: song.tags.artist,
         album: song.tags.album,
@@ -76,7 +75,12 @@ const AudioStoreModule: Module<AudioStateI, any> = {
             src: song.meta.imageSrc
           }
         ]
-      });
+      };
+      if (!song.meta.imageSrc) {
+        metadataOpts.artwork = [];
+      }
+      // @ts-ignore
+      navigator.mediaSession.metadata = new MediaMetadata(metadataOpts);
     }
   }
 };

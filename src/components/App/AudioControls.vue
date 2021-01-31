@@ -32,7 +32,6 @@
             {{ selectedSong.tags.artist }}
           </v-list-item-subtitle>
         </v-list-item-content>
-        <v-spacer />
         <div style="width:250px" class="px-5">
           <v-slider
             min="0"
@@ -156,6 +155,10 @@ export default class AudioControls extends Vue {
       this.waveshape.on("ready", this.refreshDuration);
       this.volume = this.waveshape.getVolume();
     });
+    // @ts-ignore
+    navigator.mediaSession.setActionHandler("previoustrack", this.playBefore);
+    // @ts-ignore
+    navigator.mediaSession.setActionHandler("nexttrack", this.playNext);
   }
 
   changeVolume(val: number) {
@@ -166,6 +169,10 @@ export default class AudioControls extends Vue {
   destroyed() {
     this.waveshape?.unAll();
     this.waveshape?.destroy();
+    // @ts-ignore
+    navigator.mediaSession.setActionHandler("previoustrack", null);
+    // @ts-ignore
+    navigator.mediaSession.setActionHandler("nexttrack", null);
   }
 
   handlePlay() {
@@ -191,37 +198,6 @@ export default class AudioControls extends Vue {
       this.playNext();
     }
   }
-
-  // refreshAudioInfo() {
-  //   this.audioState = this.waveshape.isPlaying() ? "playing" : "paused";
-  //   this.$store.commit("audio/setAudioState", this.audioState);
-  // }
-
-  // @Watch("audio")
-  // audioListeners(newVal: HTMLAudioElement, oldVal: HTMLAudioElement) {
-  //   // console.log({ oldVal });
-  //   const eventsAudioState = ["play", "pause", "ended"];
-
-  //   if (oldVal) {
-  //     oldVal.pause();
-  //     oldVal.removeEventListener("loadedmetadata", this.refreshDuration);
-  //     oldVal.removeEventListener("timeupdate", this.refreshProgress);
-  //     oldVal.removeEventListener("ended", this.handleEnded);
-  //     eventsAudioState.forEach(ev => {
-  //       oldVal.removeEventListener(ev, this.refreshAudioInfo);
-  //     });
-  //   }
-  //   if (newVal) {
-  //     newVal.addEventListener("loadedmetadata", this.refreshDuration);
-  //     newVal.addEventListener("timeupdate", this.refreshProgress);
-  //     newVal.addEventListener("ended", this.handleEnded);
-  //     eventsAudioState.forEach(ev => {
-  //       newVal.addEventListener(ev, this.refreshAudioInfo);
-  //     });
-  //   }
-  //   this.refreshProgress();
-  //   this.refreshAudioInfo();
-  // }
 }
 </script>
 

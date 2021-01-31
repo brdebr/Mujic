@@ -95,11 +95,13 @@ const FolderStoreModule: Module<FolderStateI, any> = {
         folderPath
       );
       songFiles = songFiles.map(el => {
-        const metaImageSrc = `data:image/${el.tags.image?.mime ||
-          "png"};base64,${Buffer.from(
-          el.tags.image?.imageBuffer as Uint8Array
-        ).toString("base64")}`;
-        el.meta.imageSrc = metaImageSrc;
+        if (el.tags.image?.imageBuffer) {
+          const metaImageSrc = `data:image/${el.tags.image?.mime ||
+            "png"};base64,${Buffer.from(
+            el.tags.image?.imageBuffer as Uint8Array
+          ).toString("base64")}`;
+          el.meta.imageSrc = metaImageSrc;
+        }
         return el;
       });
       if (songFiles.length) {

@@ -2,7 +2,7 @@
   <v-row no-gutters style="padding-bottom: 100px;" class="flex-wrap">
     <v-col
       cols="12"
-      class="mb-3"
+      class="mb-5"
       v-if="$store.state.folder.folderName && !$store.state.folder.loading"
     >
       <v-card>
@@ -28,7 +28,7 @@
       </v-card>
     </v-col>
     <v-col cols="12">
-      <v-card width="100%">
+      <v-card width="100%" class="pb-1">
         <v-card-title class="text-h5 py-3 px-4">
           <div class="d-flex align-center">
             <v-btn
@@ -56,6 +56,7 @@
         <v-virtual-scroll
           :items="$store.getters['folder/filteredList']"
           bench="1"
+          class="virt-song-list"
           :item-height="73"
           height="480"
           v-if="
@@ -81,7 +82,21 @@
                 size="112"
                 height="62"
               >
-                <v-img class="black" :src="getImageFromItem(item)" />
+                <v-img
+                  class="black"
+                  v-if="item.meta.imageSrc"
+                  :src="item.meta.imageSrc"
+                />
+                <v-sheet
+                  v-else
+                  height="100%"
+                  width="100%"
+                  color="grey lighten-3"
+                >
+                  <v-icon x-large color="blue-grey lighten-2">
+                    fas fa-music
+                  </v-icon>
+                </v-sheet>
               </v-list-item-avatar>
               <v-list-item-content
                 style="border-left: 1px solid #E0E0E0"
@@ -209,12 +224,6 @@ export default class SongsList extends Vue {
     this.songInfoDialog = true;
   }
 
-  getImageFromItem(item: SongFileI) {
-    const imgByteArr = new Buffer(item.tags.image?.imageBuffer as Uint8Array);
-    return `data:image/${item.tags.image?.mime ||
-      "png"};base64,${imgByteArr.toString("base64")}`;
-  }
-
   formatDate(ms: number) {
     return moment(ms).format("HH:mm - DD/MM/yyyy");
   }
@@ -237,4 +246,11 @@ export default class SongsList extends Vue {
     margin: auto !important;
   }
 }
+// .virt-song-list {
+//   .v-virtual-scroll__item:last-of-type {
+//     .v-divider {
+//       display: none;
+//     }
+//   }
+// }
 </style>

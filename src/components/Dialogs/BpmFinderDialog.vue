@@ -1,7 +1,7 @@
 <template>
   <v-dialog v-model="dialog" max-width="650px">
     <template #activator="{on, attrs}">
-      <v-btn v-on="on" v-bind="attrs">
+      <v-btn v-on="on" v-bind="attrs" depressed class="mx-3">
         BPM
       </v-btn>
     </template>
@@ -77,11 +77,13 @@ export default class BPMFinderDialog extends Vue {
     return aux;
   }
 
+  timeout: any = null;
+
   addDiff(ev: Event) {
     ev.preventDefault();
-    if (this.diffArr.length === 32) {
-      this.lastPress = 0;
-      this.$set(this, "diffArr", []);
+    if (this.diffArr.length >= 32) {
+      this.refreshDiffData();
+      return;
     }
     if (!this.lastPress) {
       this.lastPress = Date.now();
@@ -90,6 +92,16 @@ export default class BPMFinderDialog extends Vue {
     const dateNow = Date.now();
     this.diffArr.push(dateNow - this.lastPress);
     this.lastPress = dateNow;
+    clearTimeout(this.timeout);
+    this.timeout = setTimeout(() => {
+      this.refreshDiffData();
+    }, 3000);
+  }
+
+  refreshDiffData() {
+    this.lastPress = 0;
+    this.$set(this, "diffArr", []);
+    clearTimeout(this.timeout);
   }
 
   diffArr: Array<number> = [];
