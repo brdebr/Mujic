@@ -2,6 +2,7 @@
   <v-dialog
     :value="dialog"
     max-width="1150px"
+    scrollable
     @input="v => $emit('update:dialog')"
   >
     <v-card :loading="loading">
@@ -10,7 +11,7 @@
           Song information
         </div>
         <v-spacer />
-        <div>
+        <div v-if="!editing">
           <v-btn
             outlined
             color="orange darken-3"
@@ -22,7 +23,7 @@
             </v-icon>
           </v-btn>
         </div>
-        <div class="ml-3">
+        <div class="ml-3" v-if="!editing">
           <v-btn
             outlined
             @click="showingImage = !showingImage"
@@ -98,6 +99,20 @@
         <v-card-text>
           <v-row class="flex-wrap">
             <v-col cols="12">
+              <v-divider />
+            </v-col>
+            <v-col cols="12">
+              <v-text-field
+                outlined
+                label="Filename"
+                v-model="song.name"
+                hide-details="auto"
+              />
+            </v-col>
+            <v-col cols="12">
+              <v-divider />
+            </v-col>
+            <v-col cols="12">
               <v-text-field
                 outlined
                 label="Title"
@@ -105,7 +120,7 @@
                 hide-details="auto"
               />
             </v-col>
-            <v-col cols="12">
+            <v-col cols="8">
               <v-text-field
                 outlined
                 label="Artist"
@@ -113,7 +128,15 @@
                 hide-details="auto"
               />
             </v-col>
-            <v-col cols="12">
+            <v-col cols="4">
+              <v-text-field
+                outlined
+                label="Album"
+                v-model="info.album"
+                hide-details="auto"
+              />
+            </v-col>
+            <v-col cols="6">
               <v-combobox
                 outlined
                 :items="$store.getters['folder/genreList']"
@@ -122,15 +145,38 @@
                 hide-details="auto"
               />
             </v-col>
+            <v-col cols="3">
+              <v-text-field
+                outlined
+                label="Year"
+                v-model="info.year"
+                hide-details="auto"
+              />
+            </v-col>
+            <v-col cols="3">
+              <v-text-field
+                outlined
+                label="BPM"
+                v-model="info.bpm"
+                hide-details="auto"
+              />
+            </v-col>
           </v-row>
         </v-card-text>
         <v-divider />
-        <v-card-actions class="" style="white-space: pre-wrap;">
-          <div>
-            {{ song.name }}
+        <v-card-actions class="py-3 px-6" style="white-space: pre-wrap;">
+          <div v-if="editing">
+            <v-btn
+              depressed
+              outlined
+              color="red darken-2"
+              @click="editing = false"
+            >
+              Cancel
+            </v-btn>
           </div>
           <v-spacer />
-          <div>
+          <div class="mr-2">
             <v-btn
               depressed
               color="green darken-2"

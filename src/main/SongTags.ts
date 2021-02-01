@@ -44,6 +44,7 @@ export interface AudioTag {
       url: string;
     }
   ];
+  raw?: object;
 }
 
 export async function fetchSongTag(path: string): Promise<AudioTag> {
