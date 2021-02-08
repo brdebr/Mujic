@@ -6,7 +6,8 @@ Vue.use(Vuetify);
 const MY_ICONS = {
   image: "far fa-image",
   folder: "fas fa-folder",
-  search: "fas fa-search"
+  search: "fas fa-search",
+  close: "fas fa-times-circle"
 };
 
 export default new Vuetify({
