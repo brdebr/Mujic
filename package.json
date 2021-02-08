@@ -26,6 +26,7 @@
     "axios": "^0.21.1",
     "core-js": "^3.8.3",
     "electron-icon-builder": "^1.0.2",
+    "electron-store": "^7.0.1",
     "moment": "^2.29.1",
     "music-metadata": "^7.6.6",
     "node-fetch": "^2.6.1",
