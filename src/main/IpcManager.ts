@@ -10,6 +10,7 @@ import {
   handleDownloadYT
 } from "@/main/YtDownloader";
 import moment from "moment";
+import Store from "electron-store";
 
 export enum IpcEventNames {
   dialogGetFolder = "dialogGetFolder",
@@ -30,10 +31,15 @@ export default class IpcManager {
   constructor(appPath: string) {
     this.ffmpegPath = "";
     this.appPath = appPath;
+    this.configs = new Store({
+      name: "mujic-cfg",
+      cwd: appPath
+    });
   }
 
   ffmpegPath: string;
   appPath: string;
+  configs: Store;
 
   preWindowListeners() {
     ipcMain.handle("check-ffmpeg", event => {
@@ -129,6 +135,17 @@ export default class IpcManager {
 
     ipcMain.handle("update-song-tags", (event, tags, songPath) => {
       return updateSongTags(tags, songPath);
+    });
+
+    ipcMain.handle(
+      "set-store-config",
+      (event, store: string, key: string, data: object) => {
+        this.configs.set(`${store}.${key}`, data);
+      }
+    );
+
+    ipcMain.handle("get-store-config", (event, store: string, key: string) => {
+      return this.configs.get(`${store}.${key}`);
     });
 
     handleDownloadYT(this);

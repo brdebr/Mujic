@@ -44,8 +44,30 @@ export interface AudioTag {
       url: string;
     }
   ];
+  unsynchronisedLyrics?: {
+    language: "eng" | "spa" | "jap";
+    text: string;
+  };
   raw?: object;
 }
+
+export const GENRE_COLORS_ARRAY = [
+  "#FFCDD2",
+  "#00796B",
+  "#2979FF",
+  "#2979FF",
+  "#1A237E",
+  "#C5CAE9",
+  "#311B92",
+  "#B39DDB",
+  "#F06292",
+  "#BDBDBD",
+  "#546E7A",
+  "#A1887F",
+  "#F57C00",
+  "#C6FF00",
+  "#2E7D32"
+];
 
 export async function fetchSongTag(path: string): Promise<AudioTag> {
   const songFile = await fs.promises.readFile(path);

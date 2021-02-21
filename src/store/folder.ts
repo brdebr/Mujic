@@ -9,6 +9,7 @@ export interface FolderStateI {
   songFiles: Array<SongFileI>;
   loading: boolean;
   search: string;
+  genreArray: Array<any>;
 }
 
 export interface SongFileI {
@@ -33,7 +34,8 @@ const FolderStoreModule: Module<FolderStateI, any> = {
     selected: 0,
     songFiles: [],
     loading: false,
-    search: ""
+    search: "",
+    genreArray: []
   },
   mutations: {
     setFolderName: (state, payload) => {
@@ -47,6 +49,9 @@ const FolderStoreModule: Module<FolderStateI, any> = {
     },
     setSongFiles: (state, payload) => {
       state.songFiles = payload;
+    },
+    setGenreArray: (state, list) => {
+      state.genreArray = list;
     },
     selectSong: (state, index) => {
       if (index >= 0 && index < state.songFiles.length) {
@@ -62,10 +67,8 @@ const FolderStoreModule: Module<FolderStateI, any> = {
     selectedSong(state) {
       return state.songFiles[state.selected];
     },
-    genreList(state) {
-      return [
-        ...new Set(state.songFiles.map(el => el.tags.genre).filter(el => el))
-      ];
+    genreTextArray(state) {
+      return state.genreArray.map(el => el.text);
     },
     filteredList(state) {
       if (!state.search) {
@@ -77,6 +80,12 @@ const FolderStoreModule: Module<FolderStateI, any> = {
     }
   },
   actions: {
+    async fetchGenreArray(ctx) {
+      ctx.commit(
+        "setGenreArray",
+        (await ipcRenderer.invoke("get-store-config", "genres", "list")) || []
+      );
+    },
     async selectSongByIndex(ctx, index) {
       ctx.commit("selectSong", index);
       await ctx.dispatch("audio/fetchAudio64", null, { root: true });

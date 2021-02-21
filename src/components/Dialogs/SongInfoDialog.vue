@@ -137,13 +137,7 @@
               />
             </v-col>
             <v-col cols="6">
-              <v-combobox
-                outlined
-                :items="$store.getters['folder/genreList']"
-                label="Genre"
-                v-model="info.genre"
-                hide-details="auto"
-              />
+              <GenreSelector v-model="info.genre" />
             </v-col>
             <v-col cols="3">
               <v-text-field
@@ -204,9 +198,14 @@ import Component from "vue-class-component";
 import { Prop, Watch } from "vue-property-decorator";
 import { ipcRenderer } from "electron";
 import { SongFileI } from "@/store/folder";
-import { AudioTag } from "@/main/SongTags";
+import { AudioTag, GENRE_COLORS_ARRAY } from "@/main/SongTags";
+import GenreSelector from "@/components/Utils/GenreSelector.vue";
 
-@Component({})
+@Component({
+  components: {
+    GenreSelector
+  }
+})
 export default class SongInfoDialog extends Vue {
   @Prop()
   dialog!: boolean;
@@ -264,10 +263,47 @@ export default class SongInfoDialog extends Vue {
 
   info: AudioTag = {};
 
+  async addOrSelectGenre(input: string) {
+    if (!input) {
+      return;
+    }
+    console.log({ input });
+    const randomize = (arr: Array<any>) =>
+      arr[Math.floor(Math.random() * arr.length)];
+
+    const found = (this.$store.state.folder.genreArray as Array<{
+      text: string;
+      color: string;
+    }>).find(el => el.text === input);
+
+    if (!found && typeof input === "string") {
+      ipcRenderer.invoke("set-store-config", "genres", "list", [
+        ...this.$store.state.folder.genreArray,
+        {
+          text: input,
+          color: randomize(GENRE_COLORS_ARRAY)
+        }
+      ]);
+      await this.$store.dispatch("folder/fetchGenreArray");
+      // @ts-ignore
+      this.info.genre = this.$store.state.folder.genreArray.find(
+        // @ts-ignore
+        el => el.text === input
+      );
+      console.log("Add to the list");
+    }
+    // @ts-ignore
+    console.log(this.$refs.genreField.blur());
+  }
+
   resetState() {
     this.showingImage = false;
     this.containImage = false;
     this.editing = false;
+  }
+
+  async mounted() {
+    await this.$store.dispatch("folder/fetchGenreArray");
   }
 
   @Watch("dialog")

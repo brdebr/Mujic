@@ -117,6 +117,9 @@
                         </v-icon>
                       </span>
                     </div>
+                    <div>
+                      {{ item.tags.genre }}
+                    </div>
                     <div class="pr-3" v-if="item.tags.bpm">
                       {{ item.tags.bpm || "???" }} ♪
                     </div>
