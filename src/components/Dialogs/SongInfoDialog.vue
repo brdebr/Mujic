@@ -96,22 +96,25 @@
             fas fa-music
           </v-icon>
         </v-sheet>
+        <v-row no-gutters class="flex-wrap">
+          <v-col cols="12">
+            <v-divider />
+          </v-col>
+          <v-col cols="12" class="px-12 py-5">
+            <v-text-field
+              outlined
+              label="Filename"
+              disabled
+              v-model="song.name"
+              hide-details="auto"
+            />
+          </v-col>
+          <v-col cols="12">
+            <v-divider />
+          </v-col>
+        </v-row>
         <v-card-text>
-          <v-row class="flex-wrap">
-            <v-col cols="12">
-              <v-divider />
-            </v-col>
-            <v-col cols="12">
-              <v-text-field
-                outlined
-                label="Filename"
-                v-model="song.name"
-                hide-details="auto"
-              />
-            </v-col>
-            <v-col cols="12">
-              <v-divider />
-            </v-col>
+          <v-row class="flex-wrap pt-4">
             <v-col cols="12">
               <v-text-field
                 outlined
@@ -151,9 +154,14 @@
               <v-text-field
                 outlined
                 label="BPM"
+                class="bpm-field"
                 v-model="info.bpm"
                 hide-details="auto"
-              />
+              >
+                <template #append>
+                  <BpmFinderDialog @bpm="setBpm" />
+                </template>
+              </v-text-field>
             </v-col>
           </v-row>
         </v-card-text>
@@ -198,12 +206,14 @@ import Component from "vue-class-component";
 import { Prop, Watch } from "vue-property-decorator";
 import { ipcRenderer } from "electron";
 import { SongFileI } from "@/store/folder";
+import BpmFinderDialog from "@/components/Dialogs/BpmFinderDialog.vue";
 import { AudioTag, GENRE_COLORS_ARRAY } from "@/main/SongTags";
 import GenreSelector from "@/components/Utils/GenreSelector.vue";
 
 @Component({
   components: {
-    GenreSelector
+    GenreSelector,
+    BpmFinderDialog
   }
 })
 export default class SongInfoDialog extends Vue {
@@ -262,6 +272,10 @@ export default class SongInfoDialog extends Vue {
   imageBase64: string | null = null;
 
   info: AudioTag = {};
+
+  setBpm(val: number) {
+    this.$set(this.info, "bpm", val);
+  }
 
   async addOrSelectGenre(input: string) {
     if (!input) {
@@ -347,6 +361,14 @@ export default class SongInfoDialog extends Vue {
       background-color: rgba(0, 0, 0, 0.2);
       width: 100%;
     }
+  }
+}
+.bpm-field {
+  .v-input__append-inner {
+    margin: auto !important;
+  }
+  .v-input__slot {
+    padding-right: 0px !important;
   }
 }
 </style>

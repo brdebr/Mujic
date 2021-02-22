@@ -44,7 +44,7 @@ export interface AudioTag {
       url: string;
     }
   ];
-  unsynchronisedLyrics?: {
+  unsynchronizedLyrics?: {
     language: "eng" | "spa" | "jap";
     text: string;
   };

@@ -1,8 +1,18 @@
 <template>
   <v-dialog v-model="dialog" max-width="650px">
     <template #activator="{on, attrs}">
-      <v-btn v-on="on" v-bind="attrs" depressed class="mx-3">
-        BPM
+      <v-btn
+        icon
+        tile
+        outlined
+        v-on="on"
+        v-bind="attrs"
+        depressed
+        class="mx-3 bpm-button"
+      >
+        <v-icon small>
+          fas fa-drum
+        </v-icon>
       </v-btn>
     </template>
     <v-card>
@@ -82,7 +92,9 @@ export default class BPMFinderDialog extends Vue {
   addDiff(ev: Event) {
     ev.preventDefault();
     if (this.diffArr.length >= 32) {
+      this.$emit("bpm", parseFloat(this.BPM));
       this.refreshDiffData();
+      this.dialog = false;
       return;
     }
     if (!this.lastPress) {
@@ -133,5 +145,8 @@ export default class BPMFinderDialog extends Vue {
     text-align: center;
     color: black !important;
   }
+}
+.bpm-button {
+  border-radius: 4px !important;
 }
 </style>
