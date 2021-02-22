@@ -117,7 +117,7 @@
                         </v-icon>
                       </span>
                     </div>
-                    <div>
+                    <div class="pr-3">
                       {{ item.tags.genre }}
                     </div>
                     <div class="pr-3" v-if="item.tags.bpm">

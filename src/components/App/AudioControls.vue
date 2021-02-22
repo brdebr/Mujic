@@ -51,9 +51,6 @@
           </v-btn>
         </v-list-item-icon>
         <v-list-item-icon>
-          <BpmFinderDialog />
-        </v-list-item-icon>
-        <v-list-item-icon>
           <v-btn outlined icon @click="playBefore">
             <v-icon small>fas fa-fast-backward</v-icon>
           </v-btn>

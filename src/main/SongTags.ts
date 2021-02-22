@@ -52,21 +52,26 @@ export interface AudioTag {
 }
 
 export const GENRE_COLORS_ARRAY = [
-  "#FFCDD2",
+  "#6b0711",
   "#00796B",
-  "#2979FF",
+  "#34425a",
   "#2979FF",
   "#1A237E",
   "#C5CAE9",
-  "#311B92",
+  "#382881",
   "#B39DDB",
   "#F06292",
-  "#BDBDBD",
-  "#546E7A",
-  "#A1887F",
-  "#F57C00",
+  "#a3b158",
+  "#4f88a3",
+  "#cc5c34",
+  "#798824",
   "#C6FF00",
-  "#2E7D32"
+  "#2E7D32",
+  "#ce21bf",
+  "#2a8f2f",
+  "#e4e125",
+  "#1cf1f1",
+  "#c21111"
 ];
 
 export async function fetchSongTag(path: string): Promise<AudioTag> {

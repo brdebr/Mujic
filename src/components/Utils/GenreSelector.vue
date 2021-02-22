@@ -15,6 +15,7 @@
     :search-input.sync="search"
     :hide-no-data="!search"
     label="Genre"
+    hide-details="auto"
   >
     <template #no-data>
       <v-list-item>
@@ -61,10 +62,14 @@ import { ipcRenderer } from "electron";
   }
 })
 export default class GenreSelector extends Vue {
+  // @ts-ignore
   model = this.value
-    ? typeof this.value === "string"
-      ? [this.value]
-      : this.value
+    ? // @ts-ignore
+      typeof this.value === "string"
+      ? // @ts-ignore
+        [this.value]
+      : // @ts-ignore
+        this.value
     : [];
 
   @Prop()
@@ -81,7 +86,7 @@ export default class GenreSelector extends Vue {
   get genreDarkMap() {
     // @ts-ignore
     return this.$store.state?.folder?.genreArray.reduce((acc, el) => {
-      acc[el.text] = this.isDark(el.color);
+      acc[el.text] = el.dark;
       return acc;
     }, {});
   }
@@ -99,7 +104,7 @@ export default class GenreSelector extends Vue {
         {
           text: item,
           color: randomColor,
-          dark: this.isDark(randomColor, 130)
+          dark: this.isDark(randomColor, 131)
         }
       ]);
       await this.fetchGenreList();
@@ -107,7 +112,7 @@ export default class GenreSelector extends Vue {
   }
 
   @Watch("model")
-  refreshValue(newVal: [string], oldVaL) {
+  refreshValue(newVal: [string], oldVaL: [string]) {
     if (!newVal.length) {
       this.$emit("input", undefined);
     } else {
