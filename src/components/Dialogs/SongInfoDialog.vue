@@ -74,6 +74,7 @@
         </v-card-actions>
       </template>
       <template v-else>
+        <!-- 
         <v-img
           height="240px"
           v-if="imageBase64"
@@ -113,8 +114,110 @@
             <v-divider />
           </v-col>
         </v-row>
+         -->
         <v-card-text>
           <v-row class="flex-wrap pt-4">
+            <v-col cols="6">
+              <v-row no-gutters class="flex-wrap">
+                <v-col cols="12">
+                  <v-img
+                    aspect-ratio="31/12"
+                    min-height="240px"
+                    v-if="imageBase64"
+                    :src="imageBase64"
+                    style="border-radius: 4px;border: 1px solid #90A4AE !important;"
+                    class="grey lighten-3"
+                  />
+                  <v-sheet
+                    v-else
+                    height="100%"
+                    color="grey lighten-3"
+                    outlined
+                    rounded
+                    min-height="240px"
+                    class="d-flex mx-auto"
+                    style="border-color: #90A4AE !important;"
+                    width="100%"
+                  >
+                    <v-icon x-large color="blue-grey lighten-2" class="ma-auto">
+                      fas fa-music
+                    </v-icon>
+                  </v-sheet>
+                </v-col>
+                <v-col cols="12" class="mt-3 d-flex justify-center">
+                  <v-btn x-small outlined color="grey darken-1">
+                    Change image
+                  </v-btn>
+                </v-col>
+              </v-row>
+            </v-col>
+            <v-col cols="6">
+              <v-row no-gutters class="flex-wrap">
+                <v-col cols="12" class="mt-1 mb-2">
+                  <v-text-field
+                    outlined
+                    label="Filename"
+                    readonly
+                    :title="song.name"
+                    :value="song.name"
+                    hide-details="auto"
+                  />
+                </v-col>
+                <v-col cols="12" class="mt-1 d-flex justify-center">
+                  <v-btn x-small outlined color="grey darken-1">
+                    Change location / modify filename
+                  </v-btn>
+                </v-col>
+                <v-col cols="12" class="pt-3 pb-2">
+                  <v-divider />
+                </v-col>
+                <v-col cols="12" class="mt-2 px-1 d-flex justify-space-between">
+                  <span>
+                    <b class="mr-1">
+                      Created at:
+                    </b>
+                    <span>
+                      {{ formatDate(song.meta.birthtimeMs) }}
+                    </span>
+                  </span>
+                  <span>
+                    <b class="mr-1">
+                      Modified at:
+                    </b>
+                    <span>
+                      {{ formatDate(song.meta.mtimeMs) }}
+                    </span>
+                  </span>
+                </v-col>
+                <v-col cols="12" class="mt-2 px-1 d-flex justify-space-between">
+                  <div>
+                    <b>
+                      Size :
+                    </b>
+                    <span>
+                      {{ formatBytes(song.meta.size) }}
+                    </span>
+                  </div>
+                  <div>
+                    <b>
+                      Duration :
+                    </b>
+                    <span> {{ song.tags.length }} min </span>
+                  </div>
+                </v-col>
+                <v-col cols="12" class="mt-2 px-1" :title="song.path">
+                  <b>
+                    Path :
+                  </b>
+                  <span>
+                    {{ song.path }}
+                  </span>
+                </v-col>
+              </v-row>
+            </v-col>
+            <v-col cols="12" class="pt-1">
+              <v-divider />
+            </v-col>
             <v-col cols="12">
               <v-text-field
                 outlined
@@ -239,6 +342,7 @@ import { SongFileI } from "@/store/folder";
 import BpmFinderDialog from "@/components/Dialogs/BpmFinderDialog.vue";
 import { AudioTag, GENRE_COLORS_ARRAY } from "@/main/SongTags";
 import GenreSelector from "@/components/Utils/GenreSelector.vue";
+import moment from "moment";
 
 @Component({
   components: {
@@ -252,7 +356,22 @@ export default class SongInfoDialog extends Vue {
 
   showingImage = false;
   containImage = false;
-  editing = false;
+  editing = true;
+
+  formatDate(ms: number) {
+    return moment(ms).format("dddd, DD/MM/yyyy - HH:mm");
+  }
+  formatBytes(bytes: number) {
+    if (bytes === 0) return "0 Bytes";
+
+    const k = 1024;
+    const dm = 2;
+    const sizes = ["Bytes", "KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB"];
+
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+
+    return `${parseFloat((bytes / Math.pow(k, i)).toFixed(dm))} ${sizes[i]}`;
+  }
 
   @Watch("showingImage")
   delayedContain(newVal: boolean) {
