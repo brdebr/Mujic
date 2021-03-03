@@ -44,6 +44,10 @@ export interface AudioTag {
       url: string;
     }
   ];
+  popularimeter?: {
+    email: string;
+    rating: number; // 1-255
+  };
   unsynchronizedLyrics?: {
     language: "eng" | "spa" | "jap";
     text: string;

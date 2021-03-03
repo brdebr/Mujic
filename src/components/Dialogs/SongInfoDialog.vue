@@ -123,7 +123,7 @@
                 hide-details="auto"
               />
             </v-col>
-            <v-col cols="8">
+            <v-col cols="6">
               <v-text-field
                 outlined
                 label="Artist"
@@ -131,7 +131,7 @@
                 hide-details="auto"
               />
             </v-col>
-            <v-col cols="4">
+            <v-col cols="6">
               <v-text-field
                 outlined
                 label="Album"
@@ -162,6 +162,36 @@
                   <BpmFinderDialog @bpm="setBpm" />
                 </template>
               </v-text-field>
+            </v-col>
+            <v-col cols="6">
+              <v-text-field
+                prepend-inner-icon="fas fa-globe"
+                outlined
+                label="URL"
+                hide-details="auto"
+              />
+            </v-col>
+            <v-col cols="3">
+              <v-text-field
+                outlined
+                label="Language"
+                v-model="info.language"
+                hide-details="auto"
+              />
+            </v-col>
+            <v-col cols="3" class="d-flex align-center justify-center">
+              <v-rating
+                dense
+                @input="setRatingVal"
+                color="yellow darken-3"
+                background-color="grey darken-1"
+                empty-icon="far fa-fw fa-star "
+                half-icon="fas fa-fw fa-star-half-alt "
+                full-icon="fas fa-fw fa-star"
+                half-increments
+                hover
+                large
+              />
             </v-col>
           </v-row>
         </v-card-text>
@@ -260,11 +290,11 @@ export default class SongInfoDialog extends Vue {
 
   async saveSongTags() {
     await ipcRenderer.invoke("update-song-tags", this.info, this.song.path);
-    this.dialog = false;
     this.$store.dispatch(
       "folder/fetchSongFiles",
       this.$store.state.folder.folderName
     );
+    this.$emit("close");
   }
 
   loading = false;
@@ -275,6 +305,27 @@ export default class SongInfoDialog extends Vue {
 
   setBpm(val: number) {
     this.$set(this.info, "bpm", val);
+  }
+
+  setRatingVal(val) {
+    console.log(val * 2);
+    const map = {
+      "1": 26,
+      "2": 51,
+      "3": 77,
+      "4": 102,
+      "5": 128,
+      "6": 153,
+      "7": 179,
+      "8": 204,
+      "9": 230,
+      "10": 255
+    };
+    this.$set(this.info, "popularimeter", {
+      email: "Windows Media Player 9 Series",
+      // @ts-ignore
+      rating: map[`${val * 2}`]
+    });
   }
 
   async addOrSelectGenre(input: string) {
