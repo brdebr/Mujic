@@ -184,7 +184,11 @@
         </v-card-text>
       </v-card>
     </v-col>
-    <SongInfoDialog :dialog.sync="songInfoDialog" :song="selectedSong" />
+    <SongInfoDialog
+      :dialog.sync="songInfoDialog"
+      @close="songInfoDialog = false"
+      :song="selectedSong"
+    />
   </v-row>
 </template>
 
