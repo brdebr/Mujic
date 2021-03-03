@@ -45,6 +45,17 @@ export default class IpcManager {
     ipcMain.handle("check-ffmpeg", event => {
       return !!this.ffmpegPath;
     });
+
+    ipcMain.handle(
+      "set-store-config",
+      (event, store: string, key: string, data: object) => {
+        this.configs.set(`${store}.${key}`, data);
+      }
+    );
+
+    ipcMain.handle("get-store-config", (event, store: string, key: string) => {
+      return this.configs.get(`${store}.${key}`);
+    });
   }
 
   initListeners() {
@@ -135,17 +146,6 @@ export default class IpcManager {
 
     ipcMain.handle("update-song-tags", (event, tags, songPath) => {
       return updateSongTags(tags, songPath);
-    });
-
-    ipcMain.handle(
-      "set-store-config",
-      (event, store: string, key: string, data: object) => {
-        this.configs.set(`${store}.${key}`, data);
-      }
-    );
-
-    ipcMain.handle("get-store-config", (event, store: string, key: string) => {
-      return this.configs.get(`${store}.${key}`);
     });
 
     handleDownloadYT(this);
