@@ -9,8 +9,25 @@
     </div>
     <v-list v-if="selectedSong">
       <v-list-item>
+        <v-list-item-avatar
+          style="border-radius: 4px;"
+          class="my-0 pa-0 mr-2"
+          size="112"
+          height="62"
+        >
+          <v-img
+            class="black"
+            v-if="selectedSong.meta.imageSrc"
+            :src="selectedSong.meta.imageSrc"
+          />
+          <v-sheet v-else height="100%" width="100%" color="grey lighten-3">
+            <v-icon x-large color="blue-grey lighten-2">
+              fas fa-music
+            </v-icon>
+          </v-sheet>
+        </v-list-item-avatar>
         <div class="px-3 mr-3">
-          <div>
+          <div style="border-bottom: 1px solid #c0c0c059;">
             {{ currentTimeVal }}
           </div>
           <div>
