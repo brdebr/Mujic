@@ -167,8 +167,8 @@
                     label="Filename"
                     readonly
                     class="filename-input"
-                    :title="song.name"
-                    :value="song.name"
+                    :title="song.name + song.extension"
+                    :value="song.name + song.extension"
                     hide-details="auto"
                   >
                     <template #append-outer>

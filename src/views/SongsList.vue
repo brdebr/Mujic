@@ -65,13 +65,13 @@
               $store.state.folder.songFiles.length
           "
         >
-          <template #default="{ item, index }">
+          <template #default="{ item }">
             <v-list-item
               :key="item.path"
               @click="selectSong(item)"
               :ripple="{ center: true }"
               :class="
-                (index === $store.state.folder.selected
+                (item.path === $store.getters['folder/selectedSong'].path
                   ? 'v-item--active v-list-item--active amber--text'
                   : null) + ' pl-1 py-1'
               "
