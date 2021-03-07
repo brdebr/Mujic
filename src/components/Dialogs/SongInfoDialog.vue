@@ -178,10 +178,10 @@
                   <v-divider />
                 </v-col>
                 <v-col cols="12" class="mt-2 px-1">
-                  <v-row no-gutters class="flex-wrap">
+                  <v-row no-gutters class="flex-wrap song-details-text">
                     <v-col cols="12" class="mb-2">
                       <span>
-                        <b class="mr-1">
+                        <b>
                           Created at:
                         </b>
                         <span>
@@ -191,7 +191,7 @@
                     </v-col>
                     <v-col cols="12" class="mb-2">
                       <span>
-                        <b class="mr-1">
+                        <b>
                           Modified at:
                         </b>
                         <span>
@@ -598,7 +598,18 @@ export default class SongInfoDialog extends Vue {
     margin: auto !important;
   }
 }
+.song-details-text {
+  b {
+    display: inline-block;
+    min-width: 85px;
+  }
+}
 .text-field-prepend-spacing {
+  .v-label {
+    &:not(.v-label--active) {
+      padding-left: 8px;
+    }
+  }
   .v-input__append-inner {
     margin: auto !important;
   }
