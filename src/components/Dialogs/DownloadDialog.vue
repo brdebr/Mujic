@@ -245,10 +245,7 @@ export default class DownloadDialog extends Vue {
       this.loading = false;
       this.locked = true;
       this.$store.commit("download/setDialog", false);
-      this.$store.dispatch(
-        "folder/fetchSongFiles",
-        this.$store.state.folder.folderName
-      );
+      this.$store.dispatch("folder/refreshSongFiles");
     });
   }
 

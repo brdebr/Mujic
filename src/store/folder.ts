@@ -101,6 +101,36 @@ const FolderStoreModule: Module<FolderStateI, any> = {
       ctx.commit("selectSong", ctx.state.selected + diff);
       await ctx.dispatch("audio/fetchAudio64", null, { root: true });
     },
+    async refreshSongFiles(ctx) {
+      ctx.commit("setLoading", true);
+      let songFiles: SongFileI[] = await ipcRenderer.invoke(
+        IpcEventNames.getSongFiles,
+        ctx.state.folderName
+      );
+      songFiles = songFiles.map(el => {
+        if (el.tags.image?.imageBuffer) {
+          const metaImageSrc = `data:image/${el.tags.image?.mime ||
+            "png"};base64,${Buffer.from(
+            el.tags.image?.imageBuffer as Uint8Array
+          ).toString("base64")}`;
+          el.meta.imageSrc = metaImageSrc;
+        }
+        return el;
+      });
+      if (songFiles.length) {
+        ctx.commit("setSongFiles", songFiles);
+        const selectedPath = ctx.getters["selectedSong"]?.path;
+        if (selectedPath) {
+          ctx.commit(
+            "selectSong",
+            ctx.state.songFiles.findIndex(el => el.path === selectedPath)
+          );
+        } else {
+          await ctx.dispatch("selectSongByIndex", 0);
+        }
+        ctx.commit("setLoading", false);
+      }
+    },
     async fetchSongFiles(ctx, folderPath) {
       ctx.commit("setFolderName", folderPath);
       ctx.commit("setLoading", true);
