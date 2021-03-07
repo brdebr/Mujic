@@ -30,7 +30,7 @@
           <div style="border-bottom: 1px solid #c0c0c059;">
             {{ currentTimeVal }}
           </div>
-          <div>
+          <div style="border-top: 1px solid transparent;">
             {{ totalTimeVal }}
           </div>
         </div>

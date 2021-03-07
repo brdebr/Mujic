@@ -74,80 +74,74 @@
         </v-card-actions>
       </template>
       <template v-else>
-        <!-- 
-        <v-img
-          height="240px"
-          v-if="imageBase64"
-          :src="imageBase64"
-          style="border-radius: 4px;border: 1px solid #90A4AE !important;"
-          class="mx-auto my-4 grey lighten-3"
-          width="620px"
-        />
-        <v-sheet
-          v-else
-          height="240px"
-          color="grey lighten-3"
-          outlined
-          rounded
-          class="d-flex mx-auto my-4"
-          style="border-color: #90A4AE !important;"
-          width="620px"
-        >
-          <v-icon x-large color="blue-grey lighten-2" class="ma-auto">
-            fas fa-music
-          </v-icon>
-        </v-sheet>
-        <v-row no-gutters class="flex-wrap">
-          <v-col cols="12">
-            <v-divider />
-          </v-col>
-          <v-col cols="12" class="px-12 py-5">
-            <v-text-field
-              outlined
-              label="Filename"
-              disabled
-              v-model="song.name"
-              hide-details="auto"
-            />
-          </v-col>
-          <v-col cols="12">
-            <v-divider />
-          </v-col>
-        </v-row>
-         -->
-        <v-card-text>
+        <v-card-text v-if="song && song.meta" class="pt-1">
           <v-row class="flex-wrap pt-4">
             <v-col cols="6">
               <v-row no-gutters class="flex-wrap">
                 <v-col cols="12">
-                  <v-img
-                    aspect-ratio="31/12"
-                    min-height="240px"
-                    v-if="imageBase64"
-                    :src="imageBase64"
-                    style="border-radius: 4px;border: 1px solid #90A4AE !important;"
-                    class="grey lighten-3"
-                  />
-                  <v-sheet
-                    v-else
-                    height="100%"
-                    color="grey lighten-3"
-                    outlined
-                    rounded
-                    min-height="240px"
-                    class="d-flex mx-auto"
-                    style="border-color: #90A4AE !important;"
-                    width="100%"
-                  >
-                    <v-icon x-large color="blue-grey lighten-2" class="ma-auto">
-                      fas fa-music
-                    </v-icon>
-                  </v-sheet>
-                </v-col>
-                <v-col cols="12" class="mt-3 d-flex justify-center">
-                  <v-btn x-small outlined color="grey darken-1">
-                    Change image
-                  </v-btn>
+                  <v-hover #default="{ hover }">
+                    <v-img
+                      aspect-ratio="31/12"
+                      min-height="240px"
+                      v-if="imageBase64"
+                      :src="imageBase64"
+                      style="border-radius: 4px;border: 1px solid #90A4AE !important;"
+                      class="grey lighten-3"
+                    >
+                      <v-fade-transition>
+                        <div
+                          v-if="hover"
+                          class="d-flex v-card--reveal white--text"
+                        >
+                          <v-btn
+                            small
+                            class="mx-auto px-6 py-5 font-weight-bold"
+                            depressed
+                            color="white"
+                          >
+                            Change image
+                          </v-btn>
+                        </div>
+                      </v-fade-transition>
+                    </v-img>
+                  </v-hover>
+                  <v-hover #default="{ hover }">
+                    <v-sheet
+                      v-if="!imageBase64"
+                      height="100%"
+                      color="grey lighten-3"
+                      outlined
+                      rounded
+                      min-height="240px"
+                      class="d-flex mx-auto"
+                      style="border-color: #90A4AE !important;position: relative;"
+                      width="100%"
+                    >
+                      <v-icon
+                        x-large
+                        color="blue-grey lighten-2"
+                        class="ma-auto"
+                        v-if="!hover"
+                      >
+                        fas fa-music
+                      </v-icon>
+                      <v-fade-transition>
+                        <div
+                          v-if="hover"
+                          class="d-flex v-card--reveal white--text"
+                        >
+                          <v-btn
+                            small
+                            class="mx-auto px-6 py-5 font-weight-bold"
+                            depressed
+                            color="white"
+                          >
+                            Set image
+                          </v-btn>
+                        </div>
+                      </v-fade-transition>
+                    </v-sheet>
+                  </v-hover>
                 </v-col>
               </v-row>
             </v-col>
@@ -158,39 +152,55 @@
                     outlined
                     label="Filename"
                     readonly
+                    class="filename-input"
                     :title="song.name"
                     :value="song.name"
                     hide-details="auto"
-                  />
+                  >
+                    <template #append-outer>
+                      <div class="pl-2">
+                        <v-btn
+                          height="42"
+                          width="42"
+                          min-width="42"
+                          outlined
+                          color="grey darken-1"
+                        >
+                          <v-icon small>
+                            fas fa-file-export
+                          </v-icon>
+                        </v-btn>
+                      </div>
+                    </template>
+                  </v-text-field>
                 </v-col>
-                <v-col cols="12" class="mt-1 d-flex justify-center">
-                  <v-btn x-small outlined color="grey darken-1">
-                    Change location / modify filename
-                  </v-btn>
-                </v-col>
-                <v-col cols="12" class="pt-3 pb-2">
+                <v-col cols="12" class="pt-2 pb-2">
                   <v-divider />
                 </v-col>
-                <v-col cols="12" class="mt-2 px-1 d-flex justify-space-between">
-                  <span>
-                    <b class="mr-1">
-                      Created at:
-                    </b>
+                <v-col cols="12" class="mt-2 px-1">
+                  <div class="mb-2">
                     <span>
-                      {{ formatDate(song.meta.birthtimeMs) }}
+                      <b class="mr-1">
+                        Created at:
+                      </b>
+                      <span>
+                        {{ formatDate(song.meta.birthtimeMs) }}
+                      </span>
                     </span>
-                  </span>
-                  <span>
-                    <b class="mr-1">
-                      Modified at:
-                    </b>
-                    <span>
-                      {{ formatDate(song.meta.mtimeMs) }}
-                    </span>
-                  </span>
-                </v-col>
-                <v-col cols="12" class="mt-2 px-1 d-flex justify-space-between">
+                  </div>
                   <div>
+                    <span>
+                      <b class="mr-1">
+                        Modified at:
+                      </b>
+                      <span>
+                        {{ formatDate(song.meta.mtimeMs) }}
+                      </span>
+                    </span>
+                  </div>
+                </v-col>
+                <v-col cols="12" class="mt-2 px-1">
+                  <div class="mb-2">
                     <b>
                       Size :
                     </b>
@@ -198,7 +208,7 @@
                       {{ formatBytes(song.meta.size) }}
                     </span>
                   </div>
-                  <div>
+                  <div class="pr-2">
                     <b>
                       Duration :
                     </b>
@@ -215,7 +225,7 @@
                 </v-col>
               </v-row>
             </v-col>
-            <v-col cols="12" class="pt-1">
+            <v-col cols="12" class="pt-3">
               <v-divider />
             </v-col>
             <v-col cols="12">
@@ -270,14 +280,33 @@
               <v-text-field
                 prepend-inner-icon="fas fa-globe"
                 outlined
+                class="text-field-prepend-spacing"
+                v-model="youtubeUrl.url"
                 label="URL"
                 hide-details="auto"
-              />
+              >
+                <template #append>
+                  <v-btn
+                    @click="openLink(youtubeUrl.url)"
+                    outlined
+                    min-height="32"
+                    height="32"
+                    width="32"
+                    min-width="32"
+                    color="grey darken-1"
+                  >
+                    <v-icon small>
+                      fas fa-external-link-square-alt
+                    </v-icon>
+                  </v-btn>
+                </template>
+              </v-text-field>
             </v-col>
             <v-col cols="3">
-              <v-text-field
+              <v-combobox
                 outlined
                 label="Language"
+                :items="languages"
                 v-model="info.language"
                 hide-details="auto"
               />
@@ -373,6 +402,26 @@ export default class SongInfoDialog extends Vue {
     return `${parseFloat((bytes / Math.pow(k, i)).toFixed(dm))} ${sizes[i]}`;
   }
 
+  languages = ["English", "Spanish", "Japanese"];
+
+  get youtubeUrl() {
+    return (
+      this.song.tags.userDefinedUrl?.find(
+        el => el.description === "Youtube URL"
+      ) || {
+        url: "",
+        description: ""
+      }
+    );
+  }
+
+  openLink(url: string) {
+    if (!url) {
+      return;
+    }
+    ipcRenderer.invoke("open-link", url);
+  }
+
   @Watch("showingImage")
   delayedContain(newVal: boolean) {
     if (!newVal) {
@@ -426,8 +475,7 @@ export default class SongInfoDialog extends Vue {
     this.$set(this.info, "bpm", val);
   }
 
-  setRatingVal(val) {
-    console.log(val * 2);
+  setRatingVal(val: number) {
     const map = {
       "1": 26,
       "2": 51,
@@ -539,6 +587,36 @@ export default class SongInfoDialog extends Vue {
   }
   .v-input__slot {
     padding-right: 0px !important;
+  }
+}
+.filename-input {
+  .v-input__append-outer {
+    margin: auto !important;
+  }
+}
+.text-field-prepend-spacing {
+  .v-input__append-inner {
+    margin: auto !important;
+  }
+  input {
+    padding-left: 8px;
+  }
+}
+.v-card--reveal {
+  align-items: center;
+  bottom: 0;
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  letter-spacing: 0.8px;
+  line-height: 2rem;
+  background-color: transparentize(#ffa000, 0.05) !important;
+  > div {
+    white-space: pre-line;
+    font-family: Roboto;
+    letter-spacing: 2px;
+    font-size: 17px;
+    word-break: break-word;
   }
 }
 </style>
