@@ -178,50 +178,54 @@
                   <v-divider />
                 </v-col>
                 <v-col cols="12" class="mt-2 px-1">
-                  <div class="mb-2">
-                    <span>
-                      <b class="mr-1">
-                        Created at:
+                  <v-row no-gutters class="flex-wrap">
+                    <v-col cols="12" class="mb-2">
+                      <span>
+                        <b class="mr-1">
+                          Created at:
+                        </b>
+                        <span>
+                          {{ formatDate(song.meta.birthtimeMs) }}
+                        </span>
+                      </span>
+                    </v-col>
+                    <v-col cols="12" class="mb-2">
+                      <span>
+                        <b class="mr-1">
+                          Modified at:
+                        </b>
+                        <span>
+                          {{ formatDate(song.meta.mtimeMs) }}
+                        </span>
+                      </span>
+                    </v-col>
+                    <v-col cols="12" class="mb-2">
+                      <b>
+                        Size :
                       </b>
                       <span>
-                        {{ formatDate(song.meta.birthtimeMs) }}
+                        {{ formatBytes(song.meta.size) }}
                       </span>
-                    </span>
-                  </div>
-                  <div>
-                    <span>
-                      <b class="mr-1">
-                        Modified at:
+                    </v-col>
+                    <v-col cols="12" class="mb-2">
+                      <b>
+                        Duration :
+                      </b>
+                      <span> {{ song.tags.length }} min </span>
+                    </v-col>
+                    <v-col
+                      cols="12"
+                      class="mb-2 text-truncate"
+                      :title="song.path"
+                    >
+                      <b>
+                        Path :
                       </b>
                       <span>
-                        {{ formatDate(song.meta.mtimeMs) }}
+                        {{ song.path }}
                       </span>
-                    </span>
-                  </div>
-                </v-col>
-                <v-col cols="12" class="mt-2 px-1">
-                  <div class="mb-2">
-                    <b>
-                      Size :
-                    </b>
-                    <span>
-                      {{ formatBytes(song.meta.size) }}
-                    </span>
-                  </div>
-                  <div class="pr-2">
-                    <b>
-                      Duration :
-                    </b>
-                    <span> {{ song.tags.length }} min </span>
-                  </div>
-                </v-col>
-                <v-col cols="12" class="mt-2 px-1" :title="song.path">
-                  <b>
-                    Path :
-                  </b>
-                  <span>
-                    {{ song.path }}
-                  </span>
+                    </v-col>
+                  </v-row>
                 </v-col>
               </v-row>
             </v-col>
