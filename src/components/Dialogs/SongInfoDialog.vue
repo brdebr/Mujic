@@ -11,27 +11,41 @@
           Song information
         </div>
         <v-spacer />
-        <div v-if="!editing">
-          <v-btn
-            outlined
-            color="orange darken-3"
-            title="Edit song information"
-            @click="editing = !editing"
-          >
-            <v-icon size="18">
-              $edit
-            </v-icon>
-          </v-btn>
-        </div>
-        <div class="ml-3" v-if="!editing">
-          <v-btn
-            outlined
-            @click="showingImage = !showingImage"
-            title="Focus song thumbnail"
-          >
-            <v-icon> {{ showingImage ? "far" : "fas" }} fa-image </v-icon>
-          </v-btn>
-        </div>
+        <template v-if="!editing">
+          <div>
+            <v-btn
+              outlined
+              color="red darken-3"
+              title="Search in YouTube"
+              @click="findInYoutube(song.name)"
+            >
+              <v-icon size="18">
+                fas fa-search
+              </v-icon>
+            </v-btn>
+          </div>
+          <div class="ml-3">
+            <v-btn
+              outlined
+              color="orange darken-3"
+              title="Edit song information"
+              @click="editing = !editing"
+            >
+              <v-icon size="18">
+                $edit
+              </v-icon>
+            </v-btn>
+          </div>
+          <div class="ml-3" v-if="imageBase64">
+            <v-btn
+              outlined
+              @click="showingImage = !showingImage"
+              title="Focus song thumbnail"
+            >
+              <v-icon> {{ showingImage ? "far" : "fas" }} fa-image </v-icon>
+            </v-btn>
+          </div>
+        </template>
       </v-card-title>
       <v-divider />
       <template v-if="!editing">
@@ -180,22 +194,28 @@
                 <v-col cols="12" class="mt-2 px-1">
                   <v-row no-gutters class="flex-wrap song-details-text">
                     <v-col cols="12" class="mb-2">
-                      <span>
+                      <span class="d-inline-flex w-100">
                         <b>
                           Created at:
                         </b>
-                        <span>
+                        <span class="mr-auto">
                           {{ formatDate(song.meta.birthtimeMs) }}
+                        </span>
+                        <span>
+                          {{ formatDateAgo(song.meta.mtimeMs) }}
                         </span>
                       </span>
                     </v-col>
                     <v-col cols="12" class="mb-2">
-                      <span>
+                      <span class="d-inline-flex w-100">
                         <b>
                           Modified at:
                         </b>
-                        <span>
+                        <span class="mr-auto">
                           {{ formatDate(song.meta.mtimeMs) }}
+                        </span>
+                        <span>
+                          {{ formatDateAgo(song.meta.mtimeMs) }}
                         </span>
                       </span>
                     </v-col>
@@ -296,6 +316,7 @@
                     min-height="32"
                     height="32"
                     width="32"
+                    :disabled="!youtubeUrl.url"
                     min-width="32"
                     color="grey darken-1"
                   >
@@ -394,6 +415,9 @@ export default class SongInfoDialog extends Vue {
   formatDate(ms: number) {
     return moment(ms).format("dddd, DD/MM/yyyy - HH:mm");
   }
+  formatDateAgo(ms: number) {
+    return moment(ms).fromNow();
+  }
   formatBytes(bytes: number) {
     if (bytes === 0) return "0 Bytes";
 
@@ -423,6 +447,11 @@ export default class SongInfoDialog extends Vue {
     if (!url) {
       return;
     }
+    ipcRenderer.invoke("open-link", url);
+  }
+
+  findInYoutube(term: string) {
+    const url = `https://www.youtube.com/results?search_query=${term}`;
     ipcRenderer.invoke("open-link", url);
   }
 
