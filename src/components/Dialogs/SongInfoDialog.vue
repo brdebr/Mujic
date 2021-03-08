@@ -1,9 +1,11 @@
 <template>
   <v-dialog
     :value="dialog"
-    max-width="1150px"
     scrollable
+    :persistent="editing"
+    no-click-animation
     @input="v => $emit('update:dialog')"
+    transition="fade-transition"
   >
     <v-card :loading="loading">
       <v-card-title class="pb-4">
@@ -410,7 +412,7 @@ export default class SongInfoDialog extends Vue {
 
   showingImage = false;
   containImage = false;
-  editing = true;
+  editing = false;
 
   formatDate(ms: number) {
     return moment(ms).format("dddd, DD/MM/yyyy - HH:mm");
@@ -453,6 +455,7 @@ export default class SongInfoDialog extends Vue {
   findInYoutube(term: string) {
     const url = `https://www.youtube.com/results?search_query=${term}`;
     ipcRenderer.invoke("open-link", url);
+    this.dialog = false;
   }
 
   @Watch("showingImage")

@@ -25,12 +25,12 @@ async function createWindow() {
   // Create the browser window.
   win = new BrowserWindow({
     title: 'Mujic',
-    width: 1450,
-    height: 920,
+    height: 950,
+    minHeight: 800,
+    maxHeight: 1050,
+    width: 1550,
     minWidth: 800,
-    minHeight: 920,
     maxWidth: 1800,
-    maxHeight: 920,
     // @ts-ignore
     icon: path.join(__static, 'icon.png'),
     webPreferences: {

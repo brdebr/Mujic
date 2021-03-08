@@ -58,7 +58,7 @@
           bench="1"
           class="virt-song-list"
           :item-height="73"
-          height="480"
+          height="510"
           v-if="
             $store.state.folder.folderName &&
               !$store.state.folder.loading &&
