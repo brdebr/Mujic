@@ -352,6 +352,16 @@
                 large
               />
             </v-col>
+            <v-col cols="12">
+              <v-textarea
+                outlined
+                v-model="comments"
+                rows="4"
+                auto-grow
+                label="Comments"
+                hide-details="auto"
+              />
+            </v-col>
           </v-row>
         </v-card-text>
         <v-divider />
@@ -447,6 +457,10 @@ export default class SongInfoDialog extends Vue {
         description: ""
       }
     );
+  }
+
+  get comments() {
+    return this.song.tags.comment?.text;
   }
 
   openLink(url: string) {
