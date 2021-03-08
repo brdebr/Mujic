@@ -4,7 +4,7 @@
     scrollable
     :persistent="editing"
     no-click-animation
-    @input="v => $emit('update:dialog')"
+    @input="v => $emit('input', v)"
     transition="fade-transition"
   >
     <v-card :loading="loading">
@@ -404,6 +404,10 @@ import moment from "moment";
   components: {
     GenreSelector,
     BpmFinderDialog
+  },
+  model: {
+    prop: "dialog",
+    event: "input"
   }
 })
 export default class SongInfoDialog extends Vue {
@@ -455,7 +459,7 @@ export default class SongInfoDialog extends Vue {
   findInYoutube(term: string) {
     const url = `https://www.youtube.com/results?search_query=${term}`;
     ipcRenderer.invoke("open-link", url);
-    this.dialog = false;
+    this.$emit("input", false);
   }
 
   @Watch("showingImage")

@@ -185,7 +185,7 @@
       </v-card>
     </v-col>
     <SongInfoDialog
-      :dialog.sync="songInfoDialog"
+      v-model="songInfoDialog"
       @close="songInfoDialog = false"
       :song="selectedSong"
     />
