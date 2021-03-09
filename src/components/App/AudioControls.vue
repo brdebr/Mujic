@@ -42,7 +42,7 @@
             {{ selectedSong.tags.artist }}
           </v-list-item-subtitle>
         </v-list-item-content>
-        <div style="width:250px" class="px-5">
+        <div style="width:250px" class="px-5 mr-2">
           <v-slider
             min="0"
             max="100"
@@ -55,6 +55,19 @@
             prepend-icon="fas fa-volume-up"
           />
         </div>
+        <v-list-item-icon class="mr-3">
+          <v-btn
+            outlined
+            icon
+            :class="{ 'amber lighten-3': randomMode }"
+            title="Random mode"
+            :disabled="!playingNext"
+            @click="randomMode = !randomMode"
+            :style="randomMode ? 'border: 2px solid !important;' : null"
+          >
+            <v-icon small>fas fa-random</v-icon>
+          </v-btn>
+        </v-list-item-icon>
         <v-list-item-icon class="mr-10">
           <v-btn
             outlined
@@ -199,9 +212,26 @@ export default class AudioControls extends Vue {
     this.totalTimeVal = parseSecondsToHuman(this.duration);
   }
 
+  randomMode = false;
+
+  async playRandom() {
+    const max = this.$store.state.folder.songFiles.length;
+    // 0 -> max both inclusive
+    const random = Math.floor(Math.random() * (max + 1));
+    await this.$store.dispatch("folder/selectSongByIndex", random);
+    this.$nextTick(() => {
+      this.waveshape.play();
+    });
+  }
+
   handleEnded() {
+    if (this.randomMode) {
+      this.playRandom();
+      return;
+    }
     if (this.playingNext) {
       this.playNext();
+      return;
     }
   }
 }
