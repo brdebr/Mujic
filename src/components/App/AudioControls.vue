@@ -61,7 +61,10 @@
             icon
             :class="{ 'amber lighten-3': randomMode }"
             title="Random mode"
-            :disabled="!playingNext"
+            :disabled="
+              !playingNext ||
+                this.$store.state.folder.songFiles.length <= rememberAmount
+            "
             @click="randomMode = !randomMode"
             :style="randomMode ? 'border: 2px solid !important;' : null"
           >
@@ -147,6 +150,17 @@ export default class AudioControls extends Vue {
   playingNext = true;
 
   async playBefore() {
+    if (this.randomMode && this.playedRandomly.length) {
+      this.playedRandomly.pop();
+      const aux = this.playedRandomly.pop();
+      // @ts-ignore
+      this.playedRandomly.push(aux);
+      await this.$store.dispatch("folder/selectSongByIndex", aux);
+      this.$nextTick(() => {
+        this.waveshape.play();
+      });
+      return;
+    }
     await this.$store.dispatch("folder/selectSongByDiff", -1);
     this.$nextTick(() => {
       this.waveshape.play();
@@ -154,6 +168,10 @@ export default class AudioControls extends Vue {
   }
 
   async playNext() {
+    if (this.randomMode) {
+      this.playRandom();
+      return;
+    }
     await this.$store.dispatch("folder/selectSongByDiff", 1);
     this.$nextTick(() => {
       this.waveshape.play();
@@ -162,7 +180,6 @@ export default class AudioControls extends Vue {
 
   audioState: "playing" | "paused" | "stoped" = "stoped";
   progress = 0;
-  duration = 0;
   volume = 50;
   currentTimeVal = "00:00";
   totalTimeVal = "00:00";
@@ -220,16 +237,36 @@ export default class AudioControls extends Vue {
   }
 
   refreshDuration() {
-    this.duration = this.waveshape.getDuration();
-    this.totalTimeVal = parseSecondsToHuman(this.duration);
+    this.totalTimeVal = parseSecondsToHuman(this.waveshape.getDuration());
   }
 
   randomMode = false;
 
+  rememberAmount = 5;
+
+  playedRandomly: Array<number> = [];
+
+  randomNum = () =>
+    Math.floor(Math.random() * (this.$store.state.folder.songFiles.length + 1));
+
+  getPseudoRandom(): number {
+    const auxRandom = this.randomNum();
+    if (
+      this.$store.state.folder.selected === auxRandom ||
+      this.playedRandomly.includes(auxRandom)
+    ) {
+      return this.getPseudoRandom();
+    } else {
+      this.playedRandomly.push(auxRandom);
+      if (this.playedRandomly.length >= this.rememberAmount) {
+        this.playedRandomly.splice(0, 1);
+      }
+      return auxRandom;
+    }
+  }
+
   async playRandom() {
-    const max = this.$store.state.folder.songFiles.length;
-    // 0 -> max both inclusive
-    const random = Math.floor(Math.random() * (max + 1));
+    const random = this.getPseudoRandom();
     await this.$store.dispatch("folder/selectSongByIndex", random);
     this.$nextTick(() => {
       this.waveshape.play();
