@@ -87,8 +87,20 @@
         </v-list-item-icon>
         <v-list-item-icon :class="{ 'mx-5': $vuetify.breakpoint.mdAndUp }">
           <v-btn outlined icon @click="handlePlay">
-            <v-icon small>
-              {{ audioState === "playing" ? "fas fa-pause" : "fas fa-play" }}
+            <v-icon
+              small
+              :style="
+                'transition: none; ' +
+                  (audioState !== 'playing'
+                    ? 'margin-left: 3px;'
+                    : 'margin-left: 1px;')
+              "
+            >
+              {{
+                audioState === "playing"
+                  ? "fas fa-pause fa-fw"
+                  : "fas fa-play fa-fw"
+              }}
             </v-icon>
           </v-btn>
         </v-list-item-icon>
@@ -225,7 +237,7 @@ export default class AudioControls extends Vue {
   }
 
   handleEnded() {
-    if (this.randomMode) {
+    if (this.playingNext && this.randomMode) {
       this.playRandom();
       return;
     }

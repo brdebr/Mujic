@@ -46,7 +46,6 @@
             :block="!$store.state.layout.drawerMini"
             outlined
             style="color: rgba(0, 0, 0, 0.54);"
-            @click.stop="$store.commit('layout/toggleDrawerMini')"
           >
             <v-icon small>
               {{
