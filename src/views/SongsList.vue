@@ -180,7 +180,11 @@
           v-if="$store.state.folder.loading"
           class="text-center subtitle-1 pb-2 pt-1"
         >
-          LOADING
+          <v-progress-circular
+            indeterminate
+            class="ma-2"
+            color="orange darken-1"
+          ></v-progress-circular>
         </v-card-text>
       </v-card>
     </v-col>
