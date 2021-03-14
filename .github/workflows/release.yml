@@ -1,0 +1,43 @@
+# This is a basic workflow to help you get started with Actions
+
+name: Buid and release binary
+
+# Controls when the action will run.
+on:
+   workflow_dispatch:
+    inputs:
+      name:
+        description: 'Release name'
+        required: true
+
+env:
+  NODE_VERSION: '12.x'
+
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+jobs:
+  # This workflow contains a single job called "build"
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+    - run: echo "COMPOSE_INTERACTIVE_NO_CLI=1" >> $GITHUB_ENV
+    # - name: Use Node.js ${{ env.NODE_VERSION }}
+    #   uses: actions/setup-node@v1
+    #   with:
+    #     node-version: ${{ env.NODE_VERSION }}
+    # - run: npm ci
+    # - run: npm run electron:build
+    - run: |
+        docker run --rm -t \
+          --env-file <(env | grep -iE 'DEBUG|NODE_|ELECTRON_|YARN_|NPM_|CI|CIRCLE|TRAVIS_TAG|TRAVIS|TRAVIS_REPO_|TRAVIS_BUILD_|TRAVIS_BRANCH|TRAVIS_PULL_REQUEST_|APPVEYOR_|CSC_|GH_|GITHUB_|BT_|AWS_|STRIP|BUILD_') \
+          --env ELECTRON_CACHE="/root/.cache/electron" \
+          --env ELECTRON_BUILDER_CACHE="/root/.cache/electron-builder" \
+          -v ${PWD}:/project \
+          -v ${PWD##*/}-node-modules:/project/node_modules \
+          -v ~/.cache/electron:/root/.cache/electron \
+          -v ~/.cache/electron-builder:/root/.cache/electron-builder \
+          electronuserland/builder:wine \
+          /bin/bash -c "yarn && rm node_modules/fluent-ffmpeg/index.js && echo \"module.exports = require('./lib/fluent-ffmpeg');\" >> node_modules/fluent-ffmpeg/index.js && yarn electron:build"
+    - run: ls
+    - run: ls build/
