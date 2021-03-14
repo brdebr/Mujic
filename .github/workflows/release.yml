@@ -4,11 +4,9 @@ name: Buid and release binary
 
 # Controls when the action will run.
 on:
-   workflow_dispatch:
-    inputs:
-      name:
-        description: 'Release name'
-        required: true
+  push:
+    tags:
+      - '*'
 
 env:
   NODE_VERSION: '12.x'
