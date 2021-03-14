@@ -4,6 +4,7 @@ import LayoutStoreModule from "@/store/layout";
 import FolderStoreModule from "@/store/folder";
 import AudioStoreModule from "@/store/audio";
 import DownloadStoreModule from "@/store/download";
+import PlaylistStoreModule from "@/store/playlist";
 
 Vue.use(Vuex);
 
@@ -15,6 +16,7 @@ export default new Vuex.Store({
     layout: LayoutStoreModule,
     folder: FolderStoreModule,
     audio: AudioStoreModule,
-    download: DownloadStoreModule
+    download: DownloadStoreModule,
+    playlist: PlaylistStoreModule
   }
 });

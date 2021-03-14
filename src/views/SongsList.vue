@@ -2,7 +2,7 @@
   <v-row no-gutters style="padding-bottom: 100px;" class="flex-wrap">
     <v-col
       cols="12"
-      class="mb-5"
+      class="mb-7"
       v-if="$store.state.folder.folderName && !$store.state.folder.loading"
     >
       <v-card>
@@ -25,6 +25,120 @@
             </template>
           </v-text-field>
         </v-card-text>
+      </v-card>
+    </v-col>
+    <v-col cols="12" class="mb-3" v-if="$store.state.playlist.list.length">
+      <v-card class="px-3 py-2 d-flex align-center justify-space-between">
+        <span class="text-h6 pr-1">
+          Playlist
+        </span>
+        <span class="playlist-card-label">
+          <span class="text-subtitle-2">
+            {{ $store.getters["playlist/info"].length }} songs
+          </span>
+          <span class="text-subtitle-2">
+            {{ $store.getters["playlist/info"].duration }} minutes total
+          </span>
+          <span class="text-subtitle-2">
+            {{ $store.state.playlist.textDuration }}
+          </span>
+        </span>
+        <span>
+          <span>
+            <v-btn outlined class="mr-2" @click="playPlaylist">
+              <v-icon>
+                fas fa-play
+              </v-icon>
+            </v-btn>
+          </span>
+          <span>
+            <v-dialog scrollable width="800px">
+              <template #activator="{attrs, on}">
+                <v-btn outlined v-on="on" v-bind="attrs">
+                  <v-icon>
+                    fas fa-clipboard-list
+                  </v-icon>
+                </v-btn>
+              </template>
+              <v-card>
+                <v-card-title>
+                  Playlist
+                </v-card-title>
+                <v-divider />
+                <v-card-text class="pa-0">
+                  <v-list class="py-0">
+                    <v-list-item
+                      v-for="(item, index) in $store.state.playlist.list"
+                      :key="item.path"
+                      @click="removeFromPlaylist(index)"
+                      :ripple="{ center: true }"
+                      :class="
+                        (item.path ===
+                        $store.getters['folder/selectedSong'].path
+                          ? 'v-item--active v-list-item--active amber--text'
+                          : null) + ' pl-1 py-1'
+                      "
+                    >
+                      <v-list-item-avatar
+                        tile
+                        class="my-0 pa-0 mr-0"
+                        size="112"
+                        height="62"
+                      >
+                        <v-img
+                          class="black"
+                          v-if="item.meta.imageSrc"
+                          :src="item.meta.imageSrc"
+                        />
+                        <v-sheet
+                          v-else
+                          height="100%"
+                          width="100%"
+                          color="grey lighten-3"
+                        >
+                          <v-icon x-large color="blue-grey lighten-2">
+                            fas fa-music
+                          </v-icon>
+                        </v-sheet>
+                      </v-list-item-avatar>
+                      <v-list-item-content
+                        style="border-left: 1px solid #E0E0E0"
+                        class="ml-1 pl-3"
+                      >
+                        <v-list-item-title class="black--text">
+                          {{ item.name }}
+                        </v-list-item-title>
+                        <v-list-item-subtitle>
+                          <div class="d-flex align-center pt-1">
+                            <div class="pr-3">
+                              <span>
+                                {{ item.tags.length }}
+                              </span>
+                              <span>
+                                <v-icon size="12">
+                                  far fa-clock
+                                </v-icon>
+                              </span>
+                            </div>
+                            <div class="pr-3">
+                              {{ item.tags.genre }}
+                            </div>
+                            <div class="pr-3" v-if="item.tags.bpm">
+                              {{ item.tags.bpm || "???" }} ♪
+                            </div>
+                            <div>
+                              {{ item.tags.artist }}
+                            </div>
+                          </div>
+                        </v-list-item-subtitle>
+                      </v-list-item-content>
+                    </v-list-item>
+                  </v-list>
+                </v-card-text>
+              </v-card>
+            </v-dialog>
+          </span>
+        </span>
       </v-card>
     </v-col>
     <v-col cols="12">
@@ -58,7 +172,7 @@
           bench="1"
           class="virt-song-list"
           :item-height="73"
-          height="510"
+          :height="$store.state.playlist.list.length ? 437 : 510"
           v-if="
             $store.state.folder.folderName &&
               !$store.state.folder.loading &&
@@ -69,6 +183,7 @@
             <v-list-item
               :key="item.path"
               @click="selectSong(item)"
+              @contextmenu="addToPlaylist(item)"
               :ripple="{ center: true }"
               :class="
                 (item.path === $store.getters['folder/selectedSong'].path
@@ -216,12 +331,36 @@ import { SongFileI } from "@/store/folder";
 })
 export default class SongsList extends Vue {
   async selectSong(song: SongFileI) {
+    if (this.$store.state.playlist.list.length) {
+      this.addToPlaylist(song);
+      return;
+    }
     await this.$store.dispatch("folder/selectSongByPath", song.path);
     this.$store.state.audio.waveshape.play();
   }
 
   openFolder() {
     ipcRenderer.invoke("open-folder", this.$store.state.folder.folderName);
+  }
+
+  async addToPlaylist(song: SongFileI) {
+    if (!this.$store.getters["playlist/playlistMode"]) {
+      await this.$store.dispatch("folder/selectSongByPath", song.path);
+    }
+    this.$store.commit("playlist/addToList", song);
+  }
+
+  removeFromPlaylist(index: number) {
+    this.$store.commit("playlist/removeFromListByIndex", index);
+  }
+
+  async playPlaylist() {
+    const selectedSongPath = this.$store.getters["playlist/selectedSongPath"];
+    if (!selectedSongPath) {
+      return;
+    }
+    await this.$store.dispatch("folder/selectSongByPath", selectedSongPath);
+    this.$store.state.audio.waveshape.play();
   }
 
   search = "";
@@ -255,6 +394,18 @@ export default class SongsList extends Vue {
 .search-box {
   .v-input__append-inner {
     margin: auto !important;
+  }
+}
+.playlist-card-label {
+  > span {
+    padding-top: 3px;
+    &:not(:last-of-type) {
+      &::after {
+        content: "|";
+        color: rgb(192, 192, 192);
+        margin: 0 8px;
+      }
+    }
   }
 }
 </style>

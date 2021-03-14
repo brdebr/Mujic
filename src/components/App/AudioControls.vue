@@ -134,6 +134,20 @@ function parseSecondsToHuman(seconds: number) {
     .format("mm:ss");
 }
 
+function throttle(fn: Function, miliseconds: number) {
+  let isCalled = false;
+  // @ts-ignore
+  return function(...args) {
+    if (!isCalled) {
+      fn(...args);
+      isCalled = true;
+      setTimeout(function() {
+        isCalled = false;
+      }, miliseconds);
+    }
+  };
+}
+
 @Component({
   computed: {
     ...mapGetters("folder", {
@@ -190,7 +204,7 @@ export default class AudioControls extends Vue {
   mounted() {
     this.$store.commit("audio/initWaveShape");
     this.$nextTick(() => {
-      this.waveshape.on("audioprocess", this.refreshProgress);
+      this.waveshape.on("audioprocess", throttle(this.refreshProgress, 1000));
       this.waveshape.on("finish", this.handleEnded);
       this.waveshape.on("play", () => {
         this.audioState = "playing";
@@ -234,6 +248,9 @@ export default class AudioControls extends Vue {
   refreshProgress() {
     const currentTime = this.waveshape.getCurrentTime();
     this.currentTimeVal = parseSecondsToHuman(currentTime);
+    if (this.$store.state.playlist.list.length) {
+      this.$store.commit("playlist/addSecond");
+    }
   }
 
   refreshDuration() {
@@ -273,7 +290,18 @@ export default class AudioControls extends Vue {
     });
   }
 
-  handleEnded() {
+  async handleEnded() {
+    if (this.$store.getters["playlist/playlistMode"]) {
+      this.$store.commit("playlist/removeFromListByIndex", 0);
+      await this.$store.dispatch(
+        "folder/selectSongByPath",
+        this.$store.state.playlist.list[0].path
+      );
+      this.$nextTick(() => {
+        this.waveshape.play();
+      });
+      return;
+    }
     if (this.playingNext && this.randomMode) {
       this.playRandom();
       return;
