@@ -13,7 +13,7 @@
     "test:unit": "vue-cli-service test:unit",
     "lint": "vue-cli-service lint",
     "dev": "npm run electron:serve",
-    "electron:build": "vue-cli-service electron:build",
+    "electron:build": "vue-cli-service electron:build --publish never",
     "electron:generate-icons": "electron-icon-builder --input=./public/img/icon.png --output=build --flatten",
     "electron:serve": "vue-cli-service electron:serve",
     "postinstall": "electron-builder install-app-deps",
