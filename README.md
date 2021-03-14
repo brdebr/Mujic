@@ -4,8 +4,7 @@ Music player able to download from Youtube with thumbnail and edit metadata
 
 Made with Vue + Electron
 
-![Preview](https://github.com/brdebr/Mujic/blob/master/docs/imgs/layout-002.PNG?raw=true)
-
+![Preview](https://github.com/brdebr/Mujic/blob/master/docs/imgs/2021-03-14_main.png?raw=true)
 ## 🔨 Project setup
 ```
 npm i
