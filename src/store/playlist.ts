@@ -69,12 +69,16 @@ const PlaylistStoreModule: Module<PlaylistStateI, any> = {
           }
           if (acc.duration) {
             acc.duration = acc.duration.add({
+              // @ts-ignore
               minutes,
+              // @ts-ignore
               seconds
             });
           } else {
             acc.duration = moment.duration({
+              // @ts-ignore
               minutes,
+              // @ts-ignore
               seconds
             });
           }
