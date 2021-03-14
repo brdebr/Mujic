@@ -39,5 +39,15 @@ jobs:
           -v ~/.cache/electron-builder:/root/.cache/electron-builder \
           electronuserland/builder:wine \
           /bin/bash -c "yarn && rm node_modules/fluent-ffmpeg/index.js && echo \"module.exports = require('./lib/fluent-ffmpeg');\" >> node_modules/fluent-ffmpeg/index.js && yarn electron:build"
-    - run: ls
-    - run: ls build/
+    - run: ls dist_electron/
+    - name: Get package.json version
+      id: package-version
+      uses: martinbeentjes/npm-get-version-action@master
+    - name: Upload binaries to release
+      uses: svenstaro/upload-release-action@v2
+      with:
+        repo_token: ${{ secrets.GITHUB_TOKEN }}
+        file: dist_electron/mujic ${{ steps.package-version.outputs.current-version}}.exe
+        asset_name: mything
+        tag: ${{ github.ref }}
+        overwrite: true
