@@ -293,13 +293,20 @@ export default class AudioControls extends Vue {
   async handleEnded() {
     if (this.$store.getters["playlist/playlistMode"]) {
       this.$store.commit("playlist/removeFromListByIndex", 0);
-      await this.$store.dispatch(
-        "folder/selectSongByPath",
-        this.$store.state.playlist.list[0].path
-      );
-      this.$nextTick(() => {
-        this.waveshape.play();
-      });
+      if (!this.$store.state.playlist.list[0]) {
+        await this.beep();
+        await new Promise(resolve => setTimeout(resolve, 50));
+        await this.beep(800);
+        this.$store.commit("playlist/resetState");
+      } else {
+        await this.$store.dispatch(
+          "folder/selectSongByPath",
+          this.$store.state.playlist.list[0].path
+        );
+        this.$nextTick(() => {
+          this.waveshape.play();
+        });
+      }
       return;
     }
     if (this.playingNext && this.randomMode) {
@@ -310,6 +317,23 @@ export default class AudioControls extends Vue {
       this.playNext();
       return;
     }
+  }
+
+  context = new window.AudioContext();
+
+  beep(freq = 850) {
+    return new Promise<void>(res => {
+      const oscillator = this.context.createOscillator();
+      oscillator.frequency.value = freq;
+      oscillator.type = "triangle";
+      oscillator.connect(this.context.destination);
+      oscillator.start(0);
+      setTimeout(() => {
+        oscillator.stop();
+        oscillator.disconnect();
+        res();
+      }, 150);
+    });
   }
 }
 </script>

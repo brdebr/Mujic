@@ -47,6 +47,10 @@ const PlaylistStoreModule: Module<PlaylistStateI, any> = {
     },
     removeFromListByIndex(state, index) {
       state.list.splice(index, 1);
+    },
+    resetState(state){
+      state.mDuration = moment.duration(0, "seconds")
+      state.textDuration = "00:00:00"
     }
   },
   getters: {
