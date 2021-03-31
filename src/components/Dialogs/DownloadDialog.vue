@@ -138,7 +138,11 @@ export interface VideoObj {
           this.loading = true;
         }),
         switchMap(val => {
-          return from(axios.get<string>(val)).pipe(
+          return from(
+            axios.get<string>(val, {
+              withCredentials: true
+            })
+          ).pipe(
             catchError(() => {
               this.loading = false;
               this.locked = true;

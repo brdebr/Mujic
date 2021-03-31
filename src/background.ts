@@ -1,6 +1,6 @@
 "use strict";
 
-import { app, protocol, BrowserWindow, ipcMain } from 'electron';
+import { app, protocol, BrowserWindow, ipcMain, session } from 'electron';
 import installExtension, { VUEJS_DEVTOOLS } from 'electron-devtools-installer';
 import { createProtocol } from "vue-cli-plugin-electron-builder/lib";
 import IpcManager from '@/main/IpcManager';
@@ -64,6 +64,22 @@ async function createWindow() {
   });
 
   manager.initListeners();
+
+  const cookie = {
+    url: "http://www.youtube.com",
+    name: "CONSENT",
+    value: "YES+ES.es+20181216-18-0"
+  };
+
+  session.defaultSession.cookies.set(cookie).then(
+    () => {
+      console.log("Cookie set successfully");
+    },
+    error => {
+      console.log("Error setting cookie");
+      console.log(error);
+    }
+  );
 }
 app.commandLine.appendSwitch('disable-web-security'); 
 
