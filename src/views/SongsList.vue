@@ -27,10 +27,11 @@
                 </template>
               </v-text-field>
             </v-col>
-            <v-col cols="4" class="d-flex align-center">
+            <v-col cols="4" class="d-flex align-center sort-songs__container">
               <v-select
                 outlined
                 hide-details="auto"
+                :menu-props="{ offsetY: true }"
                 label="Sort by"
                 :value="$store.state.folder.selectedSort"
                 @input="v => $store.commit('folder/setSelectedSort', v)"
@@ -409,7 +410,7 @@ export default class SongsList extends Vue {
     }, {});
   }
 
-  languageFlag(value) {
+  languageFlag(value: string) {
     switch (value) {
       case "Spanishss":
         return "ES";
@@ -511,7 +512,7 @@ export default class SongsList extends Vue {
 
   selectedSong = {};
 
-  showSongInfo(song: any) {
+  showSongInfo(song: SongFileI) {
     this.selectedSong = { ...song };
     this.songInfoDialog = true;
   }
@@ -547,6 +548,19 @@ export default class SongsList extends Vue {
         color: rgb(192, 192, 192);
         margin: 0 8px;
       }
+    }
+  }
+}
+.sort-songs {
+  &__container {
+    > .v-select {
+      border-bottom-right-radius: 0;
+      border-top-right-radius: 0;
+    }
+    > .v-btn {
+      border-bottom-left-radius: 0;
+      border-top-left-radius: 0;
+      border-left: 0;
     }
   }
 }
