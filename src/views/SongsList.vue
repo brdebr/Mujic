@@ -297,7 +297,7 @@
         >
           <v-progress-circular
             indeterminate
-            class="ma-2"
+            class="ma-2 mt-4"
             color="orange darken-1"
           ></v-progress-circular>
         </v-card-text>
