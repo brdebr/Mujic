@@ -91,7 +91,7 @@
       </template>
       <template v-else>
         <v-card-text v-if="song && song.meta" class="pt-1">
-          <v-row class="flex-wrap pt-4">
+          <v-row class="flex-wrap align-center pt-4">
             <v-col cols="6">
               <v-row no-gutters class="flex-wrap">
                 <v-col cols="12">
@@ -254,13 +254,47 @@
             <v-col cols="12" class="pt-3">
               <v-divider />
             </v-col>
-            <v-col cols="12">
+            <v-col cols="9">
               <v-text-field
                 outlined
                 label="Title"
                 v-model="info.title"
                 hide-details="auto"
               />
+            </v-col>
+            <v-col cols="3">
+              <v-dialog max-width="80%">
+                <template #activator="{on, attrs}">
+                  <v-btn
+                    v-on="on"
+                    v-bind="attrs"
+                    block
+                    large
+                    outlined
+                    color="orange darken-2"
+                  >
+                    Lyrics
+                  </v-btn>
+                </template>
+                <v-card>
+                  <v-card-title>
+                    <span class="mr-auto">
+                      Lyrics
+                    </span>
+                  </v-card-title>
+                  <v-divider />
+                  <v-card-text class="py-6">
+                    <v-textarea
+                      outlined
+                      height="360"
+                      class="lyrics-area"
+                      no-resize
+                      hide-details="auto"
+                      v-model="lyrics"
+                    />
+                  </v-card-text>
+                </v-card>
+              </v-dialog>
             </v-col>
             <v-col cols="6">
               <v-text-field
@@ -342,6 +376,7 @@
               <v-rating
                 dense
                 @input="setRatingVal"
+                :value="popularimeter"
                 color="yellow darken-3"
                 background-color="grey darken-1"
                 empty-icon="far fa-fw fa-star "
@@ -453,14 +488,30 @@ export default class SongInfoDialog extends Vue {
       this.song.tags.userDefinedUrl?.find(
         el => el.description === "Youtube URL"
       ) || {
-        url: "",
+        url: "--ERROR--",
         description: ""
       }
     );
   }
 
   get comments() {
-    return this.song.tags.comment?.text;
+    return this.info.comment?.text;
+  }
+  set comments(val: string | undefined) {
+    this.info.comment = {
+      language: "eng",
+      text: val || ""
+    };
+  }
+
+  get lyrics() {
+    return this.info.unsynchronisedLyrics?.text;
+  }
+  set lyrics(val: string | undefined) {
+    this.info.unsynchronisedLyrics = {
+      language: "eng",
+      text: val || ""
+    };
   }
 
   openLink(url: string) {
@@ -529,24 +580,37 @@ export default class SongInfoDialog extends Vue {
     this.$set(this.info, "bpm", val);
   }
 
+  popularimeterMap = {
+    "0": 0,
+    "1": 26,
+    "2": 51,
+    "3": 77,
+    "4": 102,
+    "5": 128,
+    "6": 153,
+    "7": 179,
+    "8": 204,
+    "9": 230,
+    "10": 255
+  };
+
   setRatingVal(val: number) {
-    const map = {
-      "1": 26,
-      "2": 51,
-      "3": 77,
-      "4": 102,
-      "5": 128,
-      "6": 153,
-      "7": 179,
-      "8": 204,
-      "9": 230,
-      "10": 255
-    };
     this.$set(this.info, "popularimeter", {
       email: "Windows Media Player 9 Series",
       // @ts-ignore
-      rating: map[`${val * 2}`]
+      rating: this.popularimeterMap[`${val * 2}`]
     });
+  }
+
+  get popularimeter() {
+    if (!this.info.popularimeter) {
+      return 0;
+    }
+    return (
+      Object.values(this.popularimeterMap).findIndex(
+        el => el === this.info.popularimeter?.rating
+      ) / 2
+    );
   }
 
   async addOrSelectGenre(input: string) {
@@ -571,15 +635,12 @@ export default class SongInfoDialog extends Vue {
         }
       ]);
       await this.$store.dispatch("folder/fetchGenreArray");
-      // @ts-ignore
       this.info.genre = this.$store.state.folder.genreArray.find(
         // @ts-ignore
         el => el.text === input
       );
       console.log("Add to the list");
     }
-    // @ts-ignore
-    console.log(this.$refs.genreField.blur());
   }
 
   resetState() {
@@ -682,6 +743,16 @@ export default class SongInfoDialog extends Vue {
     letter-spacing: 2px;
     font-size: 17px;
     word-break: break-word;
+  }
+}
+.lyrics-area {
+  .v-text-field__slot {
+    textarea {
+      margin-top: 3px !important;
+      margin-bottom: 3px !important;
+      padding-top: 6px !important;
+      padding-bottom: 6px !important;
+    }
   }
 }
 </style>

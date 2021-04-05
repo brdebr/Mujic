@@ -7,23 +7,55 @@
     >
       <v-card>
         <v-card-text class="pa-2">
-          <v-text-field
-            placeholder="Search..."
-            dense
-            v-model="search"
-            @input="v => $store.commit('folder/setSearch', v)"
-            clearable
-            outlined
-            color="orange darken-1"
-            hide-details
-            class="search-box"
-          >
-            <template #append>
-              <v-icon size="20">
-                $search
-              </v-icon>
-            </template>
-          </v-text-field>
+          <v-row no-gutters>
+            <v-col cols="8" class="pr-3">
+              <v-text-field
+                placeholder="Search..."
+                dense
+                v-model="search"
+                @input="v => $store.commit('folder/setSearch', v)"
+                clearable
+                outlined
+                color="orange darken-1"
+                hide-details
+                class="search-box"
+              >
+                <template #append>
+                  <v-icon size="20">
+                    $search
+                  </v-icon>
+                </template>
+              </v-text-field>
+            </v-col>
+            <v-col cols="4" class="d-flex align-center">
+              <v-select
+                outlined
+                hide-details="auto"
+                label="Sort by"
+                :value="$store.state.folder.selectedSort"
+                @input="v => $store.commit('folder/setSelectedSort', v)"
+                return-object
+                dense
+                :items="sortByListMap"
+              >
+              </v-select>
+              <v-btn
+                outlined
+                color="grey darken-1"
+                height="40px"
+                @click.stop="$store.commit('folder/toggleSortOrder')"
+                small
+              >
+                <v-icon>
+                  {{
+                    $store.state.folder.sortOrder === "asc"
+                      ? "$sortAsc"
+                      : "$sortDesc"
+                  }}
+                </v-icon>
+              </v-btn>
+            </v-col>
+          </v-row>
         </v-card-text>
       </v-card>
     </v-col>
@@ -168,7 +200,7 @@
         </v-card-title>
         <v-divider />
         <v-virtual-scroll
-          :items="$store.getters['folder/filteredList']"
+          :items="$store.getters['folder/filteredSortedList']"
           bench="1"
           class="virt-song-list"
           :item-height="73"
@@ -320,7 +352,7 @@ import SongInfoDialog from "@/components/Dialogs/SongInfoDialog.vue";
 import moment from "moment";
 import OpenDownload from "@/components/Actions/OpenDownload.vue";
 import { ipcRenderer } from "electron";
-import { SongFileI } from "@/store/folder";
+import { SongFileI, SortTypes } from "@/store/folder";
 
 @Component({
   components: {
@@ -362,6 +394,69 @@ export default class SongsList extends Vue {
     await this.$store.dispatch("folder/selectSongByPath", selectedSongPath);
     this.$store.state.audio.waveshape.play();
   }
+
+  sortByListMap: Array<SortTypes> = [
+    {
+      text: "Filename",
+      property: "name",
+      type: "name"
+    },
+    {
+      text: "Title",
+      property: "title",
+      type: "tag"
+    },
+    {
+      text: "Artist",
+      property: "artist",
+      type: "tag"
+    },
+    {
+      text: "Album",
+      property: "album",
+      type: "tag"
+    },
+    {
+      text: "Genre",
+      property: "genre",
+      type: "tag"
+    },
+    {
+      text: "Year",
+      property: "year",
+      type: "tag"
+    },
+    {
+      text: "BPM",
+      property: "bpm",
+      type: "tag"
+    },
+    {
+      text: "Language",
+      property: "language",
+      type: "tag"
+    },
+    {
+      text: "Rating",
+      property: "popularimeter",
+      type: "tag"
+    },
+    {
+      text: "Created",
+      property: "birthtimeMs",
+      type: "meta"
+    },
+    {
+      text: "Modified",
+      property: "mtimeMs",
+      type: "meta"
+    },
+    {
+      text: "Duration",
+      property: "length",
+      type: "tag"
+    }
+  ];
 
   search = "";
 

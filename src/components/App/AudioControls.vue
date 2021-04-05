@@ -167,13 +167,15 @@ export default class AudioControls extends Vue {
     if (this.randomMode && this.playedRandomly.length) {
       this.playedRandomly.pop();
       const aux = this.playedRandomly.pop();
-      // @ts-ignore
-      this.playedRandomly.push(aux);
-      await this.$store.dispatch("folder/selectSongByIndex", aux);
-      this.$nextTick(() => {
-        this.waveshape.play();
-      });
-      return;
+      if (!aux) return;
+      else {
+        this.playedRandomly.push(aux);
+        await this.$store.dispatch("folder/selectSongByIndex", aux);
+        this.$nextTick(() => {
+          this.waveshape.play();
+        });
+        return;
+      }
     }
     await this.$store.dispatch("folder/selectSongByDiff", -1);
     this.$nextTick(() => {
@@ -217,6 +219,7 @@ export default class AudioControls extends Vue {
       this.waveshape.on("ready", this.refreshDuration);
       this.volume = this.waveshape.getVolume();
     });
+    // npm install --save-dev @types/wicg-mediasession <--- this will fix the types
     // @ts-ignore
     navigator.mediaSession.setActionHandler("previoustrack", this.playBefore);
     // @ts-ignore

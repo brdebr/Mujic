@@ -9,7 +9,19 @@ export interface FolderStateI {
   songFiles: Array<SongFileI>;
   loading: boolean;
   search: string;
-  genreArray: Array<any>;
+  genreArray: Array<{
+    text: string;
+    color?: string;
+    dark?: boolean;
+  }>;
+  selectedSort: SortTypes;
+  sortOrder: "asc" | "desc";
+}
+
+export interface SortTypes {
+  text: string;
+  property: string;
+  type: string;
 }
 
 export interface SongFileI {
@@ -35,7 +47,13 @@ const FolderStoreModule: Module<FolderStateI, any> = {
     songFiles: [],
     loading: false,
     search: "",
-    genreArray: []
+    genreArray: [],
+    selectedSort: {
+      text: "Filename",
+      property: "name",
+      type: "name"
+    },
+    sortOrder: "asc"
   },
   mutations: {
     setFolderName: (state, payload) => {
@@ -43,6 +61,16 @@ const FolderStoreModule: Module<FolderStateI, any> = {
     },
     setSearch: (state, payload) => {
       state.search = payload;
+    },
+    setSelectedSort: (state, payload) => {
+      state.selectedSort = payload;
+    },
+    setSortOrder(state, val) {
+      state.sortOrder === val;
+    },
+    toggleSortOrder(state) {
+      if (state.sortOrder === "desc") state.sortOrder = "asc";
+      else state.sortOrder = "desc";
     },
     setLoading: (state, payload) => {
       state.loading = payload;
@@ -77,6 +105,80 @@ const FolderStoreModule: Module<FolderStateI, any> = {
       return state.songFiles.filter(el =>
         el.name.toLowerCase().includes(state.search.toLowerCase())
       );
+    },
+    sortFunction(state) {
+      return (a: SongFileI, b: SongFileI) => {
+        switch (state.selectedSort.type) {
+          case "name":
+            if (state.sortOrder === "asc") return a.name.localeCompare(b.name);
+            else return b.name.localeCompare(a.name);
+          case "meta":
+            switch (state.selectedSort.property) {
+              case "birthtimeMs":
+                if (state.sortOrder === "asc")
+                  return a.meta.birthtimeMs - b.meta.birthtimeMs;
+                else return b.meta.birthtimeMs - a.meta.birthtimeMs;
+              case "mtimeMs":
+                if (state.sortOrder === "asc")
+                  return a.meta.mtimeMs - b.meta.mtimeMs;
+                else return b.meta.mtimeMs - a.meta.mtimeMs;
+              default:
+                return a.name.localeCompare(b.name);
+            }
+          case "tag":
+            switch (state.selectedSort.property) {
+              case "title":
+                if (state.sortOrder === "asc")
+                  return a.tags.title?.localeCompare(b.tags.title || "");
+                else return b.tags.title?.localeCompare(a.tags.title || "");
+              case "artist":
+                if (state.sortOrder === "asc")
+                  return a.tags.artist?.localeCompare(b.tags.artist || "");
+                else return b.tags.artist?.localeCompare(a.tags.artist || "");
+              case "album":
+                if (state.sortOrder === "asc")
+                  return a.tags.album?.localeCompare(b.tags.album || "");
+                else return b.tags.album?.localeCompare(a.tags.album || "");
+              case "genre":
+                if (state.sortOrder === "asc")
+                  return a.tags.genre?.localeCompare(b.tags.genre || "");
+                else return b.tags.genre?.localeCompare(a.tags.genre || "");
+              case "year":
+                if (state.sortOrder === "asc")
+                  return a.tags.year?.localeCompare(b.tags.year || "");
+                else return b.tags.year?.localeCompare(a.tags.year || "");
+              case "bpm":
+                if (state.sortOrder === "asc")
+                  return (a.tags.bpm || 0) - (b.tags.bpm || 0);
+                else return (b.tags.bpm || 0) - (a.tags.bpm || 0);
+              case "length":
+                if (state.sortOrder === "asc")
+                  return (
+                    new Date(`December 1, 1995 00:${a.tags.length}`).getTime() -
+                    new Date(`December 1, 1995 00:${b.tags.length}`).getTime()
+                  );
+                else
+                  return (
+                    new Date(`December 1, 1995 00:${b.tags.length}`).getTime() -
+                    new Date(`December 1, 1995 00:${a.tags.length}`).getTime()
+                  );
+              default:
+                return a.name.localeCompare(b.name);
+            }
+          default:
+            return a.name.localeCompare(b.name);
+        }
+      };
+    },
+    filteredSortedList(state, getters) {
+      if (!state.search) {
+        return state.songFiles.sort(getters.sortFunction);
+      }
+      return state.songFiles
+        .filter(el =>
+          el.name.toLowerCase().includes(state.search.toLowerCase())
+        )
+        .sort(getters.sortFunction);
     }
   },
   actions: {

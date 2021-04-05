@@ -48,7 +48,7 @@ export interface AudioTag {
     email: string;
     rating: number; // 1-255
   };
-  unsynchronizedLyrics?: {
+  unsynchronisedLyrics?: {
     language: "eng" | "spa" | "jap";
     text: string;
   };

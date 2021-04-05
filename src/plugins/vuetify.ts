@@ -7,7 +7,9 @@ const MY_ICONS = {
   image: "far fa-image",
   folder: "fas fa-folder",
   search: "fas fa-search",
-  close: "fas fa-times-circle"
+  close: "fas fa-times-circle",
+  sortAsc: "fas fa-sort-amount-down-alt",
+  sortDesc: "fas fa-sort-amount-down"
 };
 
 export default new Vuetify({
