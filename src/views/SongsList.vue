@@ -266,11 +266,22 @@
                       </span>
                     </div>
                     <div
-                      class="pr-3"
+                      class="pr-4"
                       style="font-size: 12.5px;"
                       v-if="item.tags.bpm"
                     >
                       {{ item.tags.bpm }} ♪
+                    </div>
+                    <div class="pr-3" style="font-size: 12.5px;">
+                      {{ item.tags.artist }}
+                    </div>
+                    <div
+                      class="pl-4 pr-5 language-view"
+                      v-if="item.tags.language"
+                    >
+                      <div>
+                        {{ languageFlag(item.tags.language) }}
+                      </div>
                     </div>
                     <div class="pr-3">
                       <v-chip
@@ -285,16 +296,6 @@
                       >
                         {{ genre }}
                       </v-chip>
-                    </div>
-                    <div class="pr-3" style="font-size: 12.5px;">
-                      {{ item.tags.artist }}
-                    </div>
-                    <div
-                      class="pl-5 pr-1"
-                      style="font-size: 10px; padding-top: 3px;"
-                      v-if="item.tags.language"
-                    >
-                      {{ languageFlag(item.tags.language) }}
                     </div>
                     <div class="ml-auto">
                       <span class="mr-10">
@@ -412,8 +413,10 @@ export default class SongsList extends Vue {
 
   languageFlag(value: string) {
     switch (value) {
-      case "Spanishss":
+      case "Spanish":
         return "ES";
+      case "English":
+        return "EN";
       default:
         return value;
     }
@@ -562,6 +565,15 @@ export default class SongsList extends Vue {
       border-top-left-radius: 0;
       border-left: 0;
     }
+  }
+}
+.language-view {
+  > div {
+    padding: 1px 2px;
+    border: 1px solid silver;
+    font-size: 9px;
+    line-height: 11px;
+    letter-spacing: 0.5px;
   }
 }
 </style>
