@@ -250,28 +250,50 @@
                 class="ml-1 pl-3"
               >
                 <v-list-item-title class="black--text">
-                  {{ item.name }}
+                  {{ item.tags.title || item.name }}
                 </v-list-item-title>
                 <v-list-item-subtitle>
                   <div class="d-flex align-center pt-1">
-                    <div class="pr-3">
+                    <div class="pr-3" style="font-size: 12.5px;">
                       <span>
                         {{ item.tags.length }}
                       </span>
                       <span>
-                        <v-icon size="12">
+                        <v-icon size="11" style="padding-bottom: 1px;">
                           far fa-clock
                         </v-icon>
                       </span>
                     </div>
+                    <div
+                      class="pr-3"
+                      style="font-size: 12.5px;"
+                      v-if="item.tags.bpm"
+                    >
+                      {{ item.tags.bpm }} ♪
+                    </div>
                     <div class="pr-3">
-                      {{ item.tags.genre }}
+                      <v-chip
+                        x-small
+                        :key="genre"
+                        :color="genreColorMap[genre]"
+                        :dark="genreDarkMap[genre]"
+                        class="mr-1"
+                        v-for="genre in (item.tags.genre || '')
+                          .split(',')
+                          .filter(el => !!el)"
+                      >
+                        {{ genre }}
+                      </v-chip>
                     </div>
-                    <div class="pr-3" v-if="item.tags.bpm">
-                      {{ item.tags.bpm || "???" }} ♪
-                    </div>
-                    <div>
+                    <div class="pr-3" style="font-size: 12.5px;">
                       {{ item.tags.artist }}
+                    </div>
+                    <div
+                      class="pl-5 pr-1"
+                      style="font-size: 10px; padding-top: 3px;"
+                      v-if="item.tags.language"
+                    >
+                      {{ languageFlag(item.tags.language) }}
                     </div>
                     <div class="ml-auto">
                       <span class="mr-10">
@@ -369,6 +391,31 @@ export default class SongsList extends Vue {
     }
     await this.$store.dispatch("folder/selectSongByPath", song.path);
     this.$store.state.audio.waveshape.play();
+  }
+
+  get genreColorMap() {
+    // @ts-ignore
+    return this.$store.state?.folder?.genreArray.reduce((acc, el) => {
+      acc[el.text] = el.color || "#102030";
+      return acc;
+    }, {});
+  }
+
+  get genreDarkMap() {
+    // @ts-ignore
+    return this.$store.state?.folder?.genreArray.reduce((acc, el) => {
+      acc[el.text] = el.dark;
+      return acc;
+    }, {});
+  }
+
+  languageFlag(value) {
+    switch (value) {
+      case "Spanishss":
+        return "ES";
+      default:
+        return value;
+    }
   }
 
   openFolder() {
