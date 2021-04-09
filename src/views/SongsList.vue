@@ -276,12 +276,14 @@
                       {{ item.tags.artist }}
                     </div>
                     <div
-                      class="pl-4 pr-5 language-view"
+                      class="pl-4 pr-5 d-flex align-center"
+                      style="padding-top: 2px;"
                       v-if="item.tags.language"
                     >
-                      <div>
-                        {{ languageFlag(item.tags.language) }}
-                      </div>
+                      <country-flag
+                        :country="languageFlag(item.tags.language)"
+                        size="small"
+                      />
                     </div>
                     <div class="pr-3">
                       <v-chip
@@ -372,6 +374,7 @@ import Vue from "vue";
 import Component from "vue-class-component";
 import OpenFolder from "@/components/Actions/OpenFolder.vue";
 import SongInfoDialog from "@/components/Dialogs/SongInfoDialog.vue";
+import CountryFlag from "vue-country-flag";
 
 import moment from "moment";
 import OpenDownload from "@/components/Actions/OpenDownload.vue";
@@ -382,7 +385,8 @@ import { SongFileI, SortTypes } from "@/store/folder";
   components: {
     OpenFolder,
     OpenDownload,
-    SongInfoDialog
+    SongInfoDialog,
+    CountryFlag
   }
 })
 export default class SongsList extends Vue {
@@ -414,9 +418,11 @@ export default class SongsList extends Vue {
   languageFlag(value: string) {
     switch (value) {
       case "Spanish":
-        return "ES";
+        return "es";
       case "English":
-        return "EN";
+        return "us";
+      case "Japanese":
+        return "jp";
       default:
         return value;
     }
