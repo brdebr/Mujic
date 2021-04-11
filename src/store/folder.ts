@@ -3,17 +3,20 @@ import { ipcRenderer } from "electron";
 import { IpcEventNames } from "@/main/IpcManager";
 import { AudioTag } from "@/main/SongTags";
 
+export interface GenreObject {
+  text: string;
+  color?: string;
+  dark?: boolean;
+}
+
 export interface FolderStateI {
   folderName: string;
   selected: number;
   songFiles: Array<SongFileI>;
   loading: boolean;
+  showFilename: boolean;
   search: string;
-  genreArray: Array<{
-    text: string;
-    color?: string;
-    dark?: boolean;
-  }>;
+  genreArray: Array<GenreObject>;
   selectedSort: SortTypes;
   sortOrder: "asc" | "desc";
 }
@@ -46,6 +49,7 @@ const FolderStoreModule: Module<FolderStateI, any> = {
     selected: 0,
     songFiles: [],
     loading: false,
+    showFilename: false,
     search: "",
     genreArray: [],
     selectedSort: {
@@ -75,11 +79,18 @@ const FolderStoreModule: Module<FolderStateI, any> = {
     setLoading: (state, payload) => {
       state.loading = payload;
     },
+    setShowFilename: (state, val) => {
+      state.showFilename = val;
+    },
     setSongFiles: (state, payload) => {
       state.songFiles = payload;
     },
     setGenreArray: (state, list) => {
       state.genreArray = list;
+    },
+    changeGenderColor: (state, newColor) => {
+      const idx = state.genreArray.findIndex(el => el.text === newColor.text);
+      state.genreArray.splice(idx, 1, newColor);
     },
     selectSong: (state, index) => {
       if (index >= 0 && index < state.songFiles.length) {
@@ -186,6 +197,15 @@ const FolderStoreModule: Module<FolderStateI, any> = {
       ctx.commit(
         "setGenreArray",
         (await ipcRenderer.invoke("get-store-config", "genres", "list")) || []
+      );
+    },
+    async saveGenreArray(ctx, newColor) {
+      ctx.commit("changeGenderColor", newColor);
+      await ipcRenderer.invoke(
+        "set-store-config",
+        "genres",
+        "list",
+        ctx.state.genreArray
       );
     },
     async selectSongByIndex(ctx, index) {

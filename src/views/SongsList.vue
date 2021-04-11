@@ -251,7 +251,11 @@
                 class="ml-1 pl-3"
               >
                 <v-list-item-title class="black--text">
-                  {{ item.tags.title || item.name }}
+                  {{
+                    $store.state.folder.showFilename
+                      ? item.name
+                      : item.tags.title || item.name
+                  }}
                 </v-list-item-title>
                 <v-list-item-subtitle>
                   <div class="d-flex align-center pt-1">

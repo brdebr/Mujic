@@ -33,33 +33,25 @@
         </v-list-item>
       </v-list>
       <v-spacer />
-      <transition name="flip-x" mode="out-in">
-        <div
-          :key="$store.state.layout.drawerMini"
-          :class="`${$store.state.layout.drawerMini ? 'mx-auto' : 'mx-3'} mb-3`"
-        >
-          <v-btn
-            :icon="$store.state.layout.drawerMini"
-            :style="{
-              paddingLeft: $store.state.layout.drawerMini ? '1px' : null
-            }"
-            :block="!$store.state.layout.drawerMini"
-            outlined
-            style="color: rgba(0, 0, 0, 0.54);"
-          >
-            <v-icon small>
-              {{
-                $store.state.layout.drawerMini
-                  ? "fas fa-chevron-right"
-                  : "fas fa-chevron-left"
-              }}
-            </v-icon>
-          </v-btn>
-        </div>
-      </transition>
+      <div
+        :class="`${$store.state.layout.drawerMini ? 'mx-auto' : 'mx-3'} mb-3`"
+      >
+        <SettingsDialog />
+      </div>
     </v-layout>
   </v-navigation-drawer>
 </template>
+
+<script lang="ts">
+import Vue from "vue";
+import SettingsDialog from "@/components/Dialogs/SettingsDialog.vue";
+
+export default Vue.extend({
+  components: {
+    SettingsDialog
+  }
+});
+</script>
 <style lang="scss" scoped>
 div.v-list-item.drawer-header {
   border-bottom-right-radius: 0 !important;

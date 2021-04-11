@@ -6,7 +6,12 @@
     :color="isDev() ? 'yellow' : 'orange accent-4'"
     class="the-toolbar"
   >
-    <v-btn outlined fab class="white--text ml-3 mr-4 custom-side-button">
+    <v-btn
+      outlined
+      fab
+      class="white--text ml-3 mr-4 custom-side-button"
+      style="visibility: hidden;"
+    >
       <v-icon small>
         fas fa-bars
       </v-icon>
