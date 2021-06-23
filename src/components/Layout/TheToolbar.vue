@@ -29,6 +29,10 @@
       </router-link>
     </v-toolbar-title>
     <v-spacer />
+    <span v-if="isDev()" class="headline grey--text  font-weight-bold">
+      D E V - V E R S I O N
+    </span>
+    <v-spacer />
     <OpenFolder />
     <OpenDownload />
   </v-app-bar>
