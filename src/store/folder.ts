@@ -53,11 +53,11 @@ const FolderStoreModule: Module<FolderStateI, any> = {
     search: "",
     genreArray: [],
     selectedSort: {
-      text: "Filename",
-      property: "name",
-      type: "name"
+      text: "Modified",
+      property: "mtimeMs",
+      type: "meta"
     },
-    sortOrder: "asc"
+    sortOrder: "desc"
   },
   mutations: {
     setFolderName: (state, payload) => {
