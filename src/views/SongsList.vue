@@ -205,7 +205,11 @@
           bench="1"
           class="virt-song-list"
           :item-height="73"
-          :height="$store.state.playlist.list.length ? 437 : 510"
+          :height="
+            `calc(100vh - ${
+              $store.state.playlist.list.length ? '450px' : '385px'
+            })`
+          "
           v-if="
             $store.state.folder.folderName &&
               !$store.state.folder.loading &&
