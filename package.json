@@ -29,7 +29,7 @@
     "electron-store": "^7.0.1",
     "moment": "^2.29.1",
     "music-metadata": "^7.6.6",
-    "node-fetch": "^2.6.1",
+    "node-fetch": "^3.1.1",
     "node-id3": "github:brdebr/node-id3",
     "roboto-fontface": "*",
     "rxjs": "^6.6.3",
